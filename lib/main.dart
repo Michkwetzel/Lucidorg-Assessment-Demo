@@ -1,25 +1,38 @@
 import 'package:flutter/material.dart';
-import 'package:front_survey_questions/screens/mainScreen.dart';
+import 'package:front_survey_questions/changeNotifiers/cards.dart';
+import 'package:front_survey_questions/changeNotifiers/screenGeometryState.dart';
+import 'package:provider/provider.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(MultiProvider(
+    providers: [
+      ChangeNotifierProvider(create: (context) => Cards()),
+      ChangeNotifierProvider(create: (context) => ScreenGeometryState()),
+    ],
+    child: MyApp(),
+  ));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
+    Cards card = Provider.of<Cards>(context);
+
     return MaterialApp(
       title: 'Survey Questaniare',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.white),
+        colorScheme: ColorScheme.fromSeed(seedColor: Color(0xFFADD1FF)),
         useMaterial3: true,
-        fontFamily: 'Nunito'
+        fontFamily: 'Nunito',
       ),
       home: Scaffold(
         backgroundColor: Colors.white,
-        body: mainScreen(),
+        body: Align(
+          alignment: Alignment.topCenter,
+          child: card.currentCard(),
+        ),
       ),
     );
   }
