@@ -2,15 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:custom_rating_bar/custom_rating_bar.dart';
 import 'package:front_survey_questions/constants.dart';
 
-class startCard extends StatelessWidget {
-  const startCard({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Placeholder();
-  }
-}
-
 class CardInstructions extends StatelessWidget {
   const CardInstructions({super.key});
 
@@ -162,19 +153,8 @@ class RightContainerMainScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Expanded(
-      child: Container(
-          padding: EdgeInsets.all(40),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
-            color: Colors.white,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.withOpacity(0.5), // Shadow color
-                spreadRadius: 5, // Spread radius
-                blurRadius: 7, // Blur radius
-              ),
-            ],
-          ),
+      child: ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: 750),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
