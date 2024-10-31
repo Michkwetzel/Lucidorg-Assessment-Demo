@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:front_survey_questions/changeNotifiers/cards.dart';
+import 'package:front_survey_questions/changeNotifiers/cardState.dart';
 import 'package:front_survey_questions/constants.dart';
 import 'package:provider/provider.dart';
 
@@ -82,7 +82,7 @@ class TopInfoBar extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      IconButton(onPressed: () => Provider.of<Cards>(context, listen: false).previousCard(), icon: Icon(Icons.arrow_back)),
+                      IconButton(onPressed: () => Provider.of<CardState>(context, listen: false).previousCard(), icon: Icon(Icons.arrow_back)),
                       Text("back", style: TextStyle(fontSize: 17),),
                     ],
                   ),

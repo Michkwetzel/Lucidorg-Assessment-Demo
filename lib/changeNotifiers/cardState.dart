@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:front_survey_questions/screens/questionScreen.dart';
 import 'package:front_survey_questions/screens/welcomeScreen.dart';
 
-class Cards extends ChangeNotifier {
+class CardState extends ChangeNotifier {
   final List _cardsList = [
     WelcomeScreen(),
     QuestionScreen(),
