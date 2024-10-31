@@ -1,20 +1,35 @@
 import 'package:flutter/material.dart';
-import 'package:front_survey_questions/changeNotifiers/cards.dart';
+import 'package:front_survey_questions/changeNotifiers/cardState.dart';
+import 'package:front_survey_questions/changeNotifiers/questionsProvider.dart';
 import 'package:front_survey_questions/changeNotifiers/screenGeometryState.dart';
+import 'package:front_survey_questions/services/firestoreService.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
+import 'package:logging/logging.dart';
 
 Future<void> main() async {
+  void initializeLogging() {
+    Logger.root.level = Level.ALL; 
+    Logger.root.onRecord.listen((record) {
+      print('${record.level.name}: ${record.time}: ${record.message}');
+    });
+  }
+
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  initializeLogging();
+
   runApp(MultiProvider(
     providers: [
-      ChangeNotifierProvider(create: (context) => Cards()),
+      ChangeNotifierProvider(create: (context) => CardState()),
       ChangeNotifierProvider(create: (context) => ScreenGeometryState()),
-    ],  
+      ChangeNotifierProvider(create: (context) => QuestionsProvider()),
+      Provider(create: (context) => FirestoreService(questions: context.read<QuestionsProvider>()))
+    ],
     child: MyApp(),
   ));
 }
@@ -24,7 +39,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Cards card = Provider.of<Cards>(context);
+    CardState card = Provider.of<CardState>(context);
 
     return MaterialApp(
       title: 'Survey Questions',
