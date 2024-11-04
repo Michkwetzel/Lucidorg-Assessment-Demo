@@ -1,7 +1,7 @@
 import 'package:front_survey_questions/helperClasses/questionBase.dart';
 
-class QuestionStars extends QuestionBase {
-  QuestionStars({
+class QuestionRating extends QuestionBase {
+  QuestionRating({
     required super.text,
     super.textExtra,
     required super.type,

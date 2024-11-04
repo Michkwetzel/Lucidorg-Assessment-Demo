@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:front_survey_questions/changeNotifiers/questionsProvider.dart';
 import 'package:front_survey_questions/helperClasses/questionBase.dart';
 import 'package:front_survey_questions/helperClasses/questionMultipleChoice.dart';
-import 'package:front_survey_questions/helperClasses/questionStars.dart';
+import 'package:front_survey_questions/helperClasses/questionRating.dart';
 import 'package:logging/logging.dart';
 import 'package:front_survey_questions/enums.dart';
 
@@ -36,11 +36,11 @@ class FirestoreService {
       Map<String, dynamic> starQuestions = docSnapshot.data()!['stars'];
       starQuestions.forEach((key, value) {
         count++;
-        questions.addQuestion(QuestionStars(
+        questions.addQuestion(QuestionRating(
           text: value['text'] ?? 'Default Text',
           textExtra: value['textInfo'],
           index: value['index'],
-          type: QuestionType.stars,
+          type: QuestionType.rating,
         ));
       });
       log.info("$count Star Questions loaded into QuestionsProvider.");
@@ -63,7 +63,7 @@ class FirestoreService {
       });
     } catch (e, stackTrace) {
       questions.setQuestions([
-        QuestionStars(
+        QuestionRating(
           text: 'There was an error getting the question. Please refresh the browser',
           index: 0,
           type: QuestionType.error,

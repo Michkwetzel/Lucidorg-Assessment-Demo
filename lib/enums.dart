@@ -5,7 +5,7 @@ enum ScreenType {
 }
 
 enum QuestionType {
-  stars,
+  rating,
   multipleChoice,
   error,
 }
