@@ -1,7 +1,7 @@
 import 'package:front_survey_questions/enums.dart';
 
 ///Base Question Class 
-///MultipleChoice and Stars inherets from this class.
+///MultipleChoice and Rating inherit from this class.
 ///Note textExtra can be null
 class QuestionBase {
   final String text;

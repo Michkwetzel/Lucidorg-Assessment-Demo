@@ -3,7 +3,6 @@ import 'package:front_survey_questions/changeNotifiers/questionsProvider.dart';
 import 'package:front_survey_questions/components/components.dart';
 import 'package:front_survey_questions/services/firestoreService.dart';
 import 'package:provider/provider.dart';
-
 import '../changeNotifiers/cardState.dart';
 
 class WelcomeScreen extends StatelessWidget {

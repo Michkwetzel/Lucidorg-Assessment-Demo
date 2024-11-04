@@ -5,7 +5,7 @@ class Questionmultiplechoice extends QuestionBase {
 
   Questionmultiplechoice({
     required super.text,
-    required super.textExtra,
+    super.textExtra,
     required super.type,
     required super.index,
     required this.options,

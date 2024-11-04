@@ -1,5 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:front_survey_questions/helperClasses/questionBase.dart';
+import 'package:front_survey_questions/helperClasses/questionMultipleChoice.dart';
+import 'package:front_survey_questions/helperClasses/questionRating.dart';
 import 'package:logging/logging.dart';
 import 'package:front_survey_questions/enums.dart';
 
@@ -29,7 +31,7 @@ class QuestionsProvider extends ChangeNotifier {
       return _questions[index];
     } else {
       log.severe("getQuestion failed to return a question at index $index");
-      return QuestionBase(text: '', textExtra: '', type: QuestionType.stars, index: 0);
+      return QuestionBase(text: '', textExtra: '', type: QuestionType.rating, index: 0);
     }
   }
 
@@ -37,5 +39,25 @@ class QuestionsProvider extends ChangeNotifier {
     for (QuestionBase question in _questions){
       log.info(question.toString());
     }
+  }
+
+  List<Questionmultiplechoice> getMultipleChoiceQuestions(){
+    List<Questionmultiplechoice> multipleChoiceQuestions = [];
+    for (QuestionBase question in _questions){
+      if (question is Questionmultiplechoice){
+        multipleChoiceQuestions.add(question);
+      }
+    }
+    return multipleChoiceQuestions;
+  }
+
+  List<QuestionRating> getStarQuestions(){
+    List<QuestionRating> starQuestions = [];
+    for (QuestionBase question in _questions){
+      if (question is QuestionRating){
+        starQuestions.add(question);
+      }
+    }
+    return starQuestions;
   }
 }
