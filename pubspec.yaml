@@ -35,12 +35,16 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.6
-  flutter_rating_bar: ^4.0.1
   custom_rating_bar: ^3.0.0
   provider: ^6.1.2
   firebase_core: ^3.6.0
   cloud_firestore: ^5.4.4
   logging: ^1.3.0
+
+  flutter_rating_bar:
+    git:
+      url: https://github.com/Michkwetzel/flutter_rating_bar_custom.git
+      ref: main  # Use the branch
 
 dev_dependencies:
   flutter_test:

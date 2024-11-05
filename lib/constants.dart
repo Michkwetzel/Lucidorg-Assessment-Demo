@@ -14,4 +14,27 @@ final kMainContainerBoxDecoration = BoxDecoration(
   boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.25), offset: Offset(0, 1), spreadRadius: 0.5, blurRadius: 0.5)],
 );
 
-const kH1TextStyle = TextStyle(fontFamily: 'Nunito', fontSize: 28, color: Color(0xFF2F2F2F), fontWeight: FontWeight.w500);
+const kH1TextStyle = TextStyle(
+  fontFamily: 'Nunito',
+  fontSize: 28,
+  color: Color(0xFF2F2F2F),
+  fontWeight: FontWeight.w500,
+);
+
+const kBodyTextStyle = TextStyle(
+  fontFamily: 'Noto Sans',
+  fontSize: 18,
+  color: Color(0xFF343434),
+);
+
+const kRatingQTextStyle = TextStyle(
+  fontFamily: 'Noto Sans',
+  fontSize: 22,
+  color: Color(0xFF343434),
+);
+
+const kRatingBarHintTextStyle = TextStyle(
+  fontFamily: 'Noto Sans',
+  fontSize: 17,
+  color: Color(0xFF878787),
+);
