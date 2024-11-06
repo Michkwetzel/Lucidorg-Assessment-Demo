@@ -1,6 +1,6 @@
 import 'package:custom_rating_bar/custom_rating_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:front_survey_questions/components/components.dart';
+import 'componentsOld.dart';
 
 class QuestionScreen extends StatefulWidget {
   const QuestionScreen({super.key});

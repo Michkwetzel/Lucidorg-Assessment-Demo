@@ -3,6 +3,7 @@ import 'package:front_survey_questions/changeNotifiers/cardState.dart';
 import 'package:front_survey_questions/changeNotifiers/questionsProvider.dart';
 import 'package:front_survey_questions/changeNotifiers/screenGeometryState.dart';
 import 'package:front_survey_questions/screens/mainScreen.dart';
+import 'package:front_survey_questions/screens/welcomeScreen.dart';
 import 'package:front_survey_questions/services/firestoreService.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -51,7 +52,10 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
         fontFamily: 'Nunito',
       ),
-      home: Scaffold(backgroundColor: Colors.white, body: Mainscreen()),
+      home: Scaffold(
+        backgroundColor: Colors.white,
+        body: WelcomeScreen(),
+      ),
     );
   }
 }
