@@ -37,6 +37,7 @@ class FirestoreService {
       starQuestions.forEach((key, value) {
         count++;
         questions.addQuestion(QuestionRating(
+          textHeading: value['textHeading'] ?? 'Default Text',
           text: value['text'] ?? 'Default Text',
           textExtra: value['textInfo'],
           index: value['index'],
@@ -57,13 +58,14 @@ class FirestoreService {
           index: value['index'],
           options: value['options'],
         ));
-        log.info("$count Multiple choice Questions loaded into QuestionsProvider.");
-        log.info("getQuestions from FireStore successful");
-        questions.printQuestions();
       });
+      log.info("$count Multiple choice Questions loaded into QuestionsProvider.");
+      questions.printQuestions();
+      log.info("getQuestions from FireStore successful");
     } catch (e, stackTrace) {
       questions.setQuestions([
         QuestionRating(
+          textHeading: "Sorry for the delay",
           text: 'There was an error getting the question. Please refresh the browser',
           index: 0,
           type: QuestionType.error,

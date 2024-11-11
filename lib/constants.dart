@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 
-const kCardQuestionTextStyle = TextStyle(fontFamily: 'Nunito', fontSize: 21);
+const kCardQuestionTextStyle = TextStyle(
+  fontFamily: 'Nunito',
+  fontSize: 21,
+  decoration: TextDecoration.none,
+);
 
 final kCardQuestionBoxDecoration = BoxDecoration(
   color: Colors.white,
@@ -16,25 +20,71 @@ final kMainContainerBoxDecoration = BoxDecoration(
 
 const kH1TextStyle = TextStyle(
   fontFamily: 'Nunito',
-  fontSize: 28,
+  fontSize: 44,
   color: Color(0xFF2F2F2F),
   fontWeight: FontWeight.w500,
+  decoration: TextDecoration.none,
+);
+
+const kH2TextStyle = TextStyle(
+  fontFamily: 'Nunito',
+  fontSize: 28,
+  color: Color(0xFF2F2F2F),
+  fontWeight: FontWeight.w400,
+  decoration: TextDecoration.none,
+);
+
+const kH3TextStyle = TextStyle(
+  fontFamily: 'Noto Sans',
+  fontSize: 28,
+  color: Color(0xFF2F2F2F),
+  fontWeight: FontWeight.w400,
+  decoration: TextDecoration.none,
+);
+
+const kWelcomeScreenH1TextStyle = TextStyle(
+  fontFamily: 'Noto Sans',
+  fontSize: 44,
+  color: Color(0xFFFFFFFF),
+  fontWeight: FontWeight.w400,
+  decoration: TextDecoration.none,
+);
+
+const kWelcomeScreenH2TextStyle = TextStyle(
+  fontFamily: 'Noto Sans',
+  fontSize: 24,
+  color: Color(0xFFFFFFFF),
+  fontWeight: FontWeight.w400,
+  decoration: TextDecoration.none,
 );
 
 const kBodyTextStyle = TextStyle(
   fontFamily: 'Noto Sans',
   fontSize: 18,
   color: Color(0xFF343434),
+  decoration: TextDecoration.none,
 );
 
 const kRatingQTextStyle = TextStyle(
   fontFamily: 'Noto Sans',
   fontSize: 22,
   color: Color(0xFF343434),
+  fontWeight: FontWeight.w400,
+  decoration: TextDecoration.none,
+);
+
+const kStartButtonTextStyle = TextStyle(
+  fontFamily: 'Noto Sans',
+  fontSize: 22,
+  color: Color(0xFF343434),
+  fontWeight: FontWeight.w400,
+  decoration: TextDecoration.none,
 );
 
 const kRatingBarHintTextStyle = TextStyle(
   fontFamily: 'Noto Sans',
   fontSize: 17,
   color: Color(0xFF878787),
+  fontWeight: FontWeight.w400,
+  decoration: TextDecoration.none,
 );

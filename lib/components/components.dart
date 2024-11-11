@@ -1,6 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:front_survey_questions/changeNotifiers/questionsProvider.dart';
+import 'package:front_survey_questions/changeNotifiers/radioButtonsState.dart';
+import 'package:front_survey_questions/changeNotifiers/ratingBarState.dart';
 import 'package:front_survey_questions/constants.dart';
+import 'package:front_survey_questions/enums.dart';
+import 'package:front_survey_questions/helperClasses/questionBase.dart';
+import 'package:front_survey_questions/helperClasses/questionMultipleChoice.dart';
+import 'package:front_survey_questions/helperClasses/questionRating.dart';
+import 'package:front_survey_questions/helperClasses/results.dart';
+import 'package:logging/logging.dart';
+import 'package:provider/provider.dart';
+
+final log = Logger("Components");
 
 class RatingQuestionCard extends StatelessWidget {
   final String questionSecondText;
@@ -11,13 +23,13 @@ class RatingQuestionCard extends StatelessWidget {
     return Column(
       children: [
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 36, vertical: 36),
+          padding: MediaQuery.of(context).size.width > 600 ? EdgeInsets.symmetric(vertical: 36) : EdgeInsets.symmetric(horizontal: 36, vertical: 36),
           child: Text(
             questionSecondText,
             style: kRatingQTextStyle,
           ),
         ),
-        CustomRatingBar(),
+        CustomRatingBar(key: Provider.of<Ratingbarstate>(context).ratingBarKey),
       ],
     );
   }
@@ -34,37 +46,21 @@ class CustomRatingBar extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        RatingBar.builder(
-          itemSize: 70,
-          initialRating: 3,
-          itemCount: 5,
-          itemBuilder: (context, index) {
-            switch (index) {
-              case 0:
+        Consumer<Ratingbarstate>(
+          builder: (context, ratingState, child) {
+            return RatingBar.builder(
+              itemSize: 70,
+              initialRating: ratingState.initialRating,
+              itemCount: 5,
+              itemBuilder: (context, index) {
                 return RatingButton(
-                  index: 1,
+                  index: index + 1,
                 );
-              case 1:
-                return RatingButton(
-                  index: 2,
-                );
-              case 2:
-                return RatingButton(
-                  index: 3,
-                );
-              case 3:
-                return RatingButton(
-                  index: 4,
-                );
-              case 4:
-                return RatingButton(
-                  index: 5,
-                );
-            }
-            return Container();
-          },
-          onRatingUpdate: (rating) {
-            print(rating);
+              },
+              onRatingUpdate: (rating) {
+                ratingState.setRating(rating);
+              },
+            );
           },
         ),
         SizedBox(
@@ -121,19 +117,29 @@ class RatingButton extends StatelessWidget {
 }
 
 class MultipleChoiceQuestionCard extends StatelessWidget {
-  final List<String> options;
+  final List<dynamic> options;
   final List<RadioButtonCard> radioButtonCards;
 
-  MultipleChoiceQuestionCard({super.key, required this.options}) : radioButtonCards = options.map((optionText) => RadioButtonCard(text: optionText)).toList();
+  MultipleChoiceQuestionCard({super.key, required this.options}) : radioButtonCards = [] {
+    int counter = 1;
+    for (String option in options) {
+      radioButtonCards.add(RadioButtonCard(text: option, radioButtonIndex: counter));
+      counter++;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Expanded(
       child: ListView.builder(
-        itemCount: radioButtonCards.length,
+        itemCount: radioButtonCards.length + 2,
         itemBuilder: (context, index) {
-          if (index != radioButtonCards.length - 1) {
-            return radioButtonCards[index];
+          if (index == 0) {
+            return SizedBox(
+              height: 24,
+            );
+          } else if (index <= radioButtonCards.length) {
+            return radioButtonCards[index - 1];
           } else {
             return SizedBox(
               height: 80,
@@ -148,8 +154,9 @@ class MultipleChoiceQuestionCard extends StatelessWidget {
 class RadioButtonCard extends StatelessWidget {
   final String text;
   final String? textExtra;
+  final int radioButtonIndex;
 
-  const RadioButtonCard({super.key, required this.text, this.textExtra});
+  const RadioButtonCard({super.key, required this.text, this.textExtra, required this.radioButtonIndex});
 
   @override
   Widget build(BuildContext context) {
@@ -164,22 +171,28 @@ class RadioButtonCard extends StatelessWidget {
       child: MaterialButton(
         padding: EdgeInsets.all(16),
         elevation: 0,
-        onPressed: () {},
+        onPressed: () => Provider.of<RadioButtonState>(context, listen: false).onRadioButtonSelected(radioButtonIndex),
         color: Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: BorderSide(color: Color(0xFFCACACA))),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+          side: BorderSide(color: Color(0xFFCACACA)),
+        ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
               padding: const EdgeInsets.only(top: 2),
-              child: Icon(
-                Icons.radio_button_off,
-                color: Color(0xFF767575),
+              child: Consumer<RadioButtonState>(
+                builder: (context, radioButtonCardState, child) {
+                  if (radioButtonCardState.selectedIndex == radioButtonIndex) {
+                    return Icon(Icons.radio_button_checked);
+                  } else {
+                    return Icon(Icons.radio_button_off, color: Color(0xFF767575));
+                  }
+                },
               ),
             ),
-            SizedBox(
-              width: 8,
-            ),
+            SizedBox(width: 8),
             Expanded(
               child: Text(
                 text,
@@ -230,8 +243,7 @@ class TopComponent extends StatelessWidget {
             Expanded(
                 child: Text(
               text,
-              style: kH1TextStyle,
-              textAlign: TextAlign.center,
+              style: kH2TextStyle,
             )),
             if (!desktop && showCloseIcon) CloseIcon(),
             if (!desktop && showCloseIcon) SizedBox(width: 8),
@@ -256,21 +268,43 @@ class CloseIcon extends StatelessWidget {
 }
 
 class CustomBackButton extends StatelessWidget {
+  final VoidCallback onPressed;
+
   const CustomBackButton({
     super.key,
+    required this.onPressed,
   });
 
   @override
   Widget build(BuildContext context) {
+    void previousQuestion() {
+      Results results = Provider.of<Results>(context, listen: false);
+      Ratingbarstate ratingbarstate = Provider.of<Ratingbarstate>(context, listen: false);
+      RadioButtonState radioButtonState = Provider.of<RadioButtonState>(context, listen: false);
+      QuestionsProvider questionsProvider = Provider.of<QuestionsProvider>(context, listen: false);
+
+      int currentQIndex = questionsProvider.currentIndex;
+      if (questionsProvider.canGoBack) {
+        Map<String, dynamic> resultPastQ = results.getResultAtIndex(currentQIndex - 1);
+        log.info('Back Button - Loading result: $resultPastQ');
+
+        if (resultPastQ['Qtype'] == QuestionType.rating) {
+          ratingbarstate.setInitialRating(resultPastQ['Qresult']);
+          questionsProvider.previousQuestion();
+        } else {
+          radioButtonState.onRadioButtonSelected(resultPastQ['Qresult']);
+          questionsProvider.previousQuestion();
+        }
+      }
+    }
+
     return Padding(
       padding: MediaQuery.of(context).size.width > 600 ? const EdgeInsets.symmetric(vertical: 32) : const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
       child: SizedBox(
-        width: 60,
-        height: 55,
+        width: 60 * 0.9,
+        height: 55 * 0.9,
         child: MaterialButton(
-          onPressed: () {
-            //TODO Your onPressed logic
-          },
+          onPressed: () => previousQuestion(),
           color: Colors.white,
           elevation: 4,
           shape: RoundedRectangleBorder(
@@ -279,7 +313,7 @@ class CustomBackButton extends StatelessWidget {
           child: const Icon(
             Icons.arrow_back_ios_new_rounded,
             color: Color(0xFF3F94FF),
-            size: 16,
+            size: 16 * 0.9,
           ),
         ),
       ),
@@ -287,20 +321,57 @@ class CustomBackButton extends StatelessWidget {
   }
 }
 
-class CustomTextButton extends StatelessWidget {
-  final String buttonText;
-  final VoidCallback onPressed;
-  const CustomTextButton({super.key, required this.buttonText, required this.onPressed});
+class CustomNextButton extends StatelessWidget {
+  const CustomNextButton({super.key});
 
   @override
   Widget build(BuildContext context) {
+    void nextQuestion() {
+      Results results = Provider.of<Results>(context, listen: false);
+      QuestionsProvider questionsProvider = Provider.of<QuestionsProvider>(context, listen: false);
+      Ratingbarstate ratingbarstate = Provider.of<Ratingbarstate>(context, listen: false);
+      RadioButtonState radioButtonState = Provider.of<RadioButtonState>(context, listen: false);
+
+      int currentQIndex = questionsProvider.currentIndex;
+      QuestionBase currentQuestion = questionsProvider.currentQuestion;
+
+      // If unanswered question
+      if (currentQIndex >= results.resultsList.length) {
+        // Get result from correct State Provider
+
+        if (currentQuestion is QuestionRating) {
+          results.addResult(quesionType: currentQuestion.type, questionResult: ratingbarstate.selectedRating, questionIndex: questionsProvider.currentIndex);
+          ratingbarstate.resetRating();
+        } else {
+          results.addResult(quesionType: currentQuestion.type, questionResult: radioButtonState.selectedIndex, questionIndex: questionsProvider.currentIndex);
+          radioButtonState.resetSelection();
+        }
+        log.info('Next Button - Displaying unanswered Questions');
+        questionsProvider.nextQuestion();
+      } else {
+        //Basically load result, and resave
+        Map<String, dynamic> resultNextQ = results.getResultAtIndex(currentQIndex);
+        log.info('Next Button - Loading result: $resultNextQ');
+        if (resultNextQ['Qtype'] == QuestionType.rating) {
+          ratingbarstate.setInitialRating(resultNextQ['Qresult']);
+          results.updateResult(quesionType: currentQuestion.type, questionResult: ratingbarstate.selectedRating, questionIndex: questionsProvider.currentIndex);
+        } else {
+          radioButtonState.onRadioButtonSelected(resultNextQ['Qresult']);
+          results.updateResult(quesionType: currentQuestion.type, questionResult: radioButtonState.selectedIndex, questionIndex: questionsProvider.currentIndex);
+        }
+
+        questionsProvider.nextQuestion();
+      }
+    }
+
+    //TODO: Set correct widhts for Floating Buttons.
     return Padding(
       padding: MediaQuery.of(context).size.width > 600 ? const EdgeInsets.symmetric(vertical: 32) : const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
       child: SizedBox(
-        width: 120,
-        height: 55,
+        width: 120 * 0.9,
+        height: 55 * 0.9,
         child: MaterialButton(
-          onPressed: onPressed  ,
+          onPressed: () => nextQuestion(),
           color: Color(0xFF3F94FF),
           elevation: 4,
           padding: EdgeInsets.zero,
@@ -311,10 +382,45 @@ class CustomTextButton extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                buttonText,
-                style: TextStyle(color: Colors.white, fontFamily: 'Noto Sans', fontSize: 22),
+                "Next",
+                style: TextStyle(color: Colors.white, fontFamily: 'Noto Sans', fontSize: 22 * 0.9),
               ),
-              const Icon(Icons.navigate_next_rounded, color: Colors.white, size: 24)
+              const Icon(Icons.navigate_next_rounded, color: Colors.white, size: 24 * 0.9)
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class CustomStartButton extends StatelessWidget {
+  final VoidCallback onPressed;
+  const CustomStartButton({super.key, required this.onPressed});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: MaterialButton(
+        onPressed: onPressed,
+        color: Color(0xFFFFFFFF),
+        elevation: 4,
+        padding: EdgeInsets.zero,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 20),
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  textAlign: TextAlign.center,
+                  "Start",
+                  style: TextStyle(color: Colors.black, fontFamily: 'Noto Sans', fontSize: 22),
+                ),
+              ),
             ],
           ),
         ),
