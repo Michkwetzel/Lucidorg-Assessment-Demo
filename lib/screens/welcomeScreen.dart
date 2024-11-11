@@ -16,15 +16,11 @@ class WelcomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     FirestoreService firestoreService = Provider.of<FirestoreService>(context, listen: false);
-    QuestionsProvider questionsProvider = Provider.of<QuestionsProvider>(context, listen: false);
 
     //gets Questions
-    //initGetQuestions(firestoreService);
+    initGetQuestions(firestoreService);
 
-    return Mainscreen(
-      welcomeScreen: true,
-      welcomeScreenLayout: WelcomeScreenComponentLayout(),
-    );
+    return WelcomeScreenComponentLayout();
   }
 }
 
@@ -33,22 +29,46 @@ class WelcomeScreenComponentLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        TopComponent(
-          text: "Welcome to Test Survey",
-          showCloseIcon: false,
-        ),
-        CustomProgressBar(),
-        Padding(
-          padding: MediaQuery.of(context).size.width > 600 ? const EdgeInsets.symmetric(vertical: 36) : const EdgeInsets.symmetric(horizontal: 24, vertical: 36),
-          child: Text(
-            "Answers are saved anonomously.\nIf you exit before finishing, your results will not be saved",
-            style: kRatingQTextStyle,
+    return Scaffold(
+      backgroundColor: Color(0xFF3F94FF),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 24),
+          child: Container(
+            constraints: BoxConstraints(maxWidth: 600),
+            child: Column(  
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Image.asset(
+                  'assets/logo/efficiency-1stLogo.png',
+                  width: 150,
+                ),
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'Welcome to the Survey',
+                      style: kWelcomeScreenH1TextStyle,
+                      textAlign: TextAlign.center,
+                    ),
+                    Text(
+                      'Answers are saved anonymously. If you exit before finishing, your result will not be saved',
+                      style: kWelcomeScreenH2TextStyle,
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+                CustomStartButton(
+                  onPressed: () { 
+                    log.info('Start Button pressed');
+                    Provider.of<QuestionsProvider>(context, listen: false).nextQuestion();
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => Mainscreen()));},
+                )
+              ],
+            ),
           ),
         ),
-      ],
+      ),
     );
   }
 }

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:front_survey_questions/changeNotifiers/cardState.dart';
 import 'package:front_survey_questions/changeNotifiers/questionsProvider.dart';
-import 'package:front_survey_questions/changeNotifiers/screenGeometryState.dart';
-import 'package:front_survey_questions/screens/mainScreen.dart';
+import 'package:front_survey_questions/changeNotifiers/radioButtonsState.dart';
+import 'package:front_survey_questions/changeNotifiers/ratingBarState.dart';
+import 'package:front_survey_questions/helperClasses/results.dart';
 import 'package:front_survey_questions/screens/welcomeScreen.dart';
 import 'package:front_survey_questions/services/firestoreService.dart';
 import 'package:provider/provider.dart';
@@ -27,12 +27,29 @@ Future<void> main() async {
 
   runApp(MultiProvider(
     providers: [
-      ChangeNotifierProvider(create: (context) => CardState()),
-      ChangeNotifierProvider(create: (context) => ScreenGeometryState()),
-      ChangeNotifierProvider(create: (context) => QuestionsProvider()),
-      ProxyProvider<QuestionsProvider, FirestoreService>(
-        update: (context, questionsProvider, firestoreService) => FirestoreService(questions: questionsProvider),
+      Provider<Results>(create: (context) => Results()),
+      // Use ChangeNotifierProxyProvider because QuestionsProvider is ChangeNotifer
+      ChangeNotifierProxyProvider<Results, QuestionsProvider>(
+        create: (context) => QuestionsProvider(context.read<Results>()),
+        update: (context, results, previousQuestionsProvider) {
+          // on Results update. update QuestionProviders results
+          if (previousQuestionsProvider == null) {
+            return QuestionsProvider(results);
+          }
+          previousQuestionsProvider.updateResults(results);
+          return previousQuestionsProvider;
+        },
       ),
+      ChangeNotifierProvider(create: (context) => RadioButtonState()),
+      ChangeNotifierProvider(create: (context) => Ratingbarstate()),
+      // User ProxyProvider because Firestore is service class but depends on ChangeNotifer QuestionsProvider
+      Provider<FirestoreService>(
+        create: (context) {
+          final questionsProvider = Provider.of<QuestionsProvider>(context, listen: false);
+          return FirestoreService(questions: questionsProvider);
+        },
+        lazy: true,
+      )
     ],
     child: MyApp(),
   ));
@@ -43,8 +60,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    CardState card = Provider.of<CardState>(context);
-
     return MaterialApp(
       title: 'Survey',
       theme: ThemeData(
@@ -52,10 +67,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
         fontFamily: 'Nunito',
       ),
-      home: Scaffold(
-        backgroundColor: Colors.white,
-        body: WelcomeScreen(),
-      ),
+      home: WelcomeScreen(),
     );
   }
 }
