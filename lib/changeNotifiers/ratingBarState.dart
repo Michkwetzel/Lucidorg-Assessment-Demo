@@ -6,7 +6,7 @@ class Ratingbarstate extends ChangeNotifier {
   double _selectedRating = 3;
 
   double get initialRating => _initialRating;
-  int get selectedRating => _selectedRating.toInt();
+  double get selectedRating => _selectedRating;
   Key get ratingBarKey => _ratingBarKey;
 
   void setRating(double rating) {
@@ -22,5 +22,11 @@ class Ratingbarstate extends ChangeNotifier {
     _initialRating = initialRating;
     _selectedRating = initialRating;
     notifyListeners();
+  }
+
+  double saveRating() {
+    double selectedRating = _selectedRating;
+    resetRating();
+    return selectedRating;
   }
 }

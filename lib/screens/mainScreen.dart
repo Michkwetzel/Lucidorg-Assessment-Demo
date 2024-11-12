@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:front_survey_questions/changeNotifiers/questionsProvider.dart';
-import 'package:front_survey_questions/changeNotifiers/ratingBarState.dart';
 import 'package:front_survey_questions/components/components.dart';
-import 'package:front_survey_questions/helperClasses/results.dart';
 import 'package:provider/provider.dart';
 
 class Mainscreen extends StatelessWidget {
@@ -12,7 +10,6 @@ class Mainscreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return Center(
       child: ConstrainedBox(
         constraints: BoxConstraints(maxWidth: 600),
@@ -22,9 +19,7 @@ class Mainscreen extends StatelessWidget {
             Align(
               alignment: Alignment.bottomLeft,
               child: CustomBackButton(
-                onPressed: () {
-                  Provider.of<QuestionsProvider>(context, listen: false).previousQuestion();
-                },
+                onPressed: () {},
               ),
             ),
             Align(
@@ -51,7 +46,7 @@ class MainComponentLayout extends StatelessWidget {
         Consumer<QuestionsProvider>(
           builder: (context, questionsProvider, child) {
             return TopComponent(
-              text: questionsProvider.topText,
+              text: questionsProvider.textHeading,
               showCloseIcon: true,
             );
           },

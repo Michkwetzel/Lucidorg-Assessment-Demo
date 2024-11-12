@@ -1,10 +1,11 @@
 import 'package:front_survey_questions/helperClasses/questionBase.dart';
 
 class QuestionRating extends QuestionBase {
-  final String textHeading;
+  final String textBody;
+
   QuestionRating({
-    required this.textHeading,
-    required super.text,
+    required this.textBody,
+    required super.textHeading,
     super.textExtra,
     required super.type,
     required super.index,

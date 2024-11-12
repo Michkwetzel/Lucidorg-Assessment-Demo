@@ -1,6 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
-import 'package:front_survey_questions/helperClasses/questionBase.dart';
 import 'package:front_survey_questions/enums.dart';
 import 'package:logging/logging.dart';
 
