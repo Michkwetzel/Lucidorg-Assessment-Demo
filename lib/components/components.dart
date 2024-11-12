@@ -4,6 +4,7 @@ import 'package:front_survey_questions/changeNotifiers/questionsProvider.dart';
 import 'package:front_survey_questions/changeNotifiers/radioButtonsState.dart';
 import 'package:front_survey_questions/changeNotifiers/ratingBarState.dart';
 import 'package:front_survey_questions/constants.dart';
+import 'package:front_survey_questions/enums.dart';
 import 'package:front_survey_questions/helperClasses/questionMultipleChoice.dart';
 import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
@@ -12,7 +13,9 @@ final log = Logger("Components");
 
 class RatingQuestionCard extends StatelessWidget {
   final String questionBody;
-  const RatingQuestionCard({super.key, required this.questionBody});
+  final bool hasExtraText;
+  final String extraText;
+  const RatingQuestionCard({super.key, required this.questionBody, required this.hasExtraText, required this.extraText});
 
   @override
   Widget build(BuildContext context) {
@@ -20,9 +23,17 @@ class RatingQuestionCard extends StatelessWidget {
       children: [
         Padding(
           padding: MediaQuery.of(context).size.width > 600 ? EdgeInsets.symmetric(vertical: 36) : EdgeInsets.symmetric(horizontal: 36, vertical: 36),
-          child: Text(
-            questionBody,
-            style: kRatingQTextStyle,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Expanded(
+                child: Text(
+                  questionBody,
+                  style: kRatingQTextStyle,
+                ),
+              ),
+              if (hasExtraText) InfoButton()
+            ],
           ),
         ),
         CustomRatingBar(key: Provider.of<Ratingbarstate>(context).ratingBarKey),
@@ -42,17 +53,21 @@ class CustomRatingBar extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        RatingBar.builder(
-          itemSize: 70,
-          initialRating: Provider.of<QuestionsProvider>(context).ratingInitialState,
-          itemCount: 5,
-          itemBuilder: (context, index) {
-            return RatingButton(
-              index: index + 1,
+        Consumer<QuestionsProvider>(
+          builder: (context, questionsProvider, child) {
+            return RatingBar.builder(
+              itemSize: 70,
+              initialRating: questionsProvider.ratingInitialState,
+              itemCount: 5,
+              itemBuilder: (context, index) {
+                return RatingButton(
+                  index: index + 1,
+                );
+              },
+              onRatingUpdate: (rating) {
+                Provider.of<Ratingbarstate>(context, listen: false).setRating(rating);
+              },
             );
-          },
-          onRatingUpdate: (rating) {
-            Provider.of<Ratingbarstate>(context, listen: false).setRating(rating);
           },
         ),
         SizedBox(
@@ -73,6 +88,39 @@ class CustomRatingBar extends StatelessWidget {
         )
       ],
     );
+  }
+}
+
+class InfoButton extends StatelessWidget {
+  const InfoButton({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+        padding: EdgeInsets.zero,
+        onPressed: () {
+          showModalBottomSheet<void>(
+              context: context,
+              builder: (BuildContext context) {
+                return Padding(
+                  padding: EdgeInsets.all(32),
+                  child: Consumer<QuestionsProvider>(
+                    builder: (context, questionsProvider, child) {
+                      return Text(
+                        questionsProvider.extraText,
+                        style: kBottomModalSheetTextStyle,
+                      );
+                    },
+                  ),
+                );
+              });
+        },
+        icon: Icon(
+          Icons.info_outline,
+          color: Color(0xFFA39C91),
+          weight: 1.33,
+          size: 23,
+        ));
   }
 }
 
@@ -213,8 +261,10 @@ class CustomProgressBar extends StatelessWidget {
 
 class TopComponent extends StatelessWidget {
   final String text;
-  final bool showCloseIcon;
-  const TopComponent({super.key, required this.text, required this.showCloseIcon});
+  final String textExtra;
+  final bool hasExtraText;
+  final QuestionType questionType;
+  const TopComponent({super.key, required this.text, required this.hasExtraText, required this.textExtra, required this.questionType});
 
   @override
   Widget build(BuildContext context) {
@@ -227,18 +277,20 @@ class TopComponent extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
       child: ConstrainedBox(
-        constraints: BoxConstraints(maxWidth: 400),
+        constraints: BoxConstraints(maxWidth: desktop ? 500 : 300),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: hasExtraText && questionType == QuestionType.multipleChoice ? MainAxisAlignment.spaceBetween : MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            Expanded(
-                child: Text(
-              text,
-              style: kH2TextStyle,
-            )),
-            if (!desktop && showCloseIcon) CloseIcon(),
-            if (!desktop && showCloseIcon) SizedBox(width: 8),
+              Flexible(
+              child: Text(
+                text,
+                style: kH2TextStyle,
+              ),
+            ),
+            if (hasExtraText && questionType == QuestionType.multipleChoice) InfoButton(),
+            if (hasExtraText && questionType == QuestionType.multipleChoice) SizedBox(width: 8),
           ],
         ),
       ),
@@ -270,11 +322,16 @@ class CustomBackButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     void previousQuestion() {
-      QuestionsProvider q = Provider.of<QuestionsProvider>(context, listen: false);
-
       log.info('Previous Button Clicked');
-      Provider.of<QuestionsProvider>(context, listen: false).previousQuestion();
-      log.info('Loading result for Q${q.currentIndex} - Result ${q.currentQuestion.result}');
+
+      QuestionsProvider q = Provider.of<QuestionsProvider>(context, listen: false);
+      if (!Provider.of<QuestionsProvider>(context, listen: false).canGoBack) {
+        Provider.of<QuestionsProvider>(context, listen: false).reset();
+        Navigator.pop(context);
+      } else {
+        Provider.of<QuestionsProvider>(context, listen: false).previousQuestion();
+        log.info('Loading result for Q${q.currentIndex} - Result ${q.currentQuestion.result}');
+      }
     }
 
     return Padding(
