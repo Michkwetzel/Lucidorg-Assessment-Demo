@@ -16,7 +16,7 @@ class QuestionsProvider extends ChangeNotifier {
 
   // Private fields
   List<QuestionBase> _questions = [];
-  String _TextHeading = '';
+  String _textHeading = '';
   int _currentIndex = -1; //Start at -1 because on first start click needs to load index = 0
   double _ratingInitialState = 3;
   int _radioInitialState = -1;
@@ -24,7 +24,7 @@ class QuestionsProvider extends ChangeNotifier {
 
   // Getters
   Widget get currentQuestionCard => _currentQuestionCard;
-  String get textHeading => _TextHeading;
+  String get textHeading => _textHeading;
   double get ratingInitialState => _ratingInitialState;
   int get radioInitialState => _radioInitialState;
   int get questionLength => _questions.length;
@@ -36,7 +36,7 @@ class QuestionsProvider extends ChangeNotifier {
 
   //Setters
   void setTopText(String text) {
-    _TextHeading = text;
+    _textHeading = text;
     notifyListeners();
   }
 
@@ -85,7 +85,7 @@ class QuestionsProvider extends ChangeNotifier {
 
     try {
       if (currentQuestion is Questionmultiplechoice) {
-        _TextHeading = currentQuestion.textHeading;
+        _textHeading = currentQuestion.textHeading;
         _currentQuestionCard = MultipleChoiceQuestionCard(options: currentQuestion.options);
         if (currentQuestion.answered) {
           _radioInitialState = currentQuestion.result.toInt();
@@ -95,7 +95,7 @@ class QuestionsProvider extends ChangeNotifier {
           radioButtonState.onRadioButtonSelected(-1);
         }
       } else if (currentQuestion is QuestionRating) {
-        _TextHeading = currentQuestion.textHeading;
+        _textHeading = currentQuestion.textHeading;
         _currentQuestionCard = RatingQuestionCard(questionBody: currentQuestion.textBody);
         if (currentQuestion.answered) {
           _ratingInitialState = currentQuestion.result;
@@ -149,7 +149,7 @@ class QuestionsProvider extends ChangeNotifier {
 
   void reset() {
     _questions.clear();
-    _TextHeading = '';
+    _textHeading = '';
     _currentIndex = -1;
     _currentQuestionCard = const Placeholder();
     notifyListeners();

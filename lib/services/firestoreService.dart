@@ -76,9 +76,7 @@ class FirestoreService {
   }
 
   void addQuestiontoDB() {
-    int index = 0;
-    String textHeading = '';
-    String textBody = '';
+    //Used to add questions to DB
 
     Map<String, Map<String, dynamic>> ratingQuestions = {
       'q1': {
