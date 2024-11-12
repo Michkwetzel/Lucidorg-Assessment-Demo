@@ -4,7 +4,7 @@ class Questionmultiplechoice extends QuestionBase {
   final List<dynamic> options;
 
   Questionmultiplechoice({
-    required super.text,
+    required super.textHeading,
     super.textExtra,
     required super.type,
     required super.index,
@@ -13,6 +13,6 @@ class Questionmultiplechoice extends QuestionBase {
 
   @override
   String toString() {
-    return "q$index, Text: $text, TextExtra: $textExtra, Type: $type, Options: $options";
+    return "q$index, Text: $textHeading, TextExtra: $textExtra, Type: $type, Options: $options";
   }
 }

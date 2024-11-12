@@ -36,7 +36,7 @@ class WelcomeScreenComponentLayout extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 24),
           child: Container(
             constraints: BoxConstraints(maxWidth: 600),
-            child: Column(  
+            child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Image.asset(
@@ -59,10 +59,12 @@ class WelcomeScreenComponentLayout extends StatelessWidget {
                   ],
                 ),
                 CustomStartButton(
-                  onPressed: () { 
+                  onPressed: () {
+                    //Provider.of<FirestoreService>(context, listen: false).addQuestiontoDB();
                     log.info('Start Button pressed');
-                    Provider.of<QuestionsProvider>(context, listen: false).nextQuestion();
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => Mainscreen()));},
+                    Provider.of<QuestionsProvider>(context, listen: false).nextQuestion(-1);
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => Mainscreen()));
+                  },
                 )
               ],
             ),

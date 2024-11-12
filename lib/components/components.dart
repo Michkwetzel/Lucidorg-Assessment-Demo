@@ -4,19 +4,15 @@ import 'package:front_survey_questions/changeNotifiers/questionsProvider.dart';
 import 'package:front_survey_questions/changeNotifiers/radioButtonsState.dart';
 import 'package:front_survey_questions/changeNotifiers/ratingBarState.dart';
 import 'package:front_survey_questions/constants.dart';
-import 'package:front_survey_questions/enums.dart';
-import 'package:front_survey_questions/helperClasses/questionBase.dart';
 import 'package:front_survey_questions/helperClasses/questionMultipleChoice.dart';
-import 'package:front_survey_questions/helperClasses/questionRating.dart';
-import 'package:front_survey_questions/helperClasses/results.dart';
 import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
 
 final log = Logger("Components");
 
 class RatingQuestionCard extends StatelessWidget {
-  final String questionSecondText;
-  const RatingQuestionCard({super.key, required this.questionSecondText});
+  final String questionBody;
+  const RatingQuestionCard({super.key, required this.questionBody});
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +21,7 @@ class RatingQuestionCard extends StatelessWidget {
         Padding(
           padding: MediaQuery.of(context).size.width > 600 ? EdgeInsets.symmetric(vertical: 36) : EdgeInsets.symmetric(horizontal: 36, vertical: 36),
           child: Text(
-            questionSecondText,
+            questionBody,
             style: kRatingQTextStyle,
           ),
         ),
@@ -46,21 +42,17 @@ class CustomRatingBar extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Consumer<Ratingbarstate>(
-          builder: (context, ratingState, child) {
-            return RatingBar.builder(
-              itemSize: 70,
-              initialRating: ratingState.initialRating,
-              itemCount: 5,
-              itemBuilder: (context, index) {
-                return RatingButton(
-                  index: index + 1,
-                );
-              },
-              onRatingUpdate: (rating) {
-                ratingState.setRating(rating);
-              },
+        RatingBar.builder(
+          itemSize: 70,
+          initialRating: Provider.of<QuestionsProvider>(context).ratingInitialState,
+          itemCount: 5,
+          itemBuilder: (context, index) {
+            return RatingButton(
+              index: index + 1,
             );
+          },
+          onRatingUpdate: (rating) {
+            Provider.of<Ratingbarstate>(context, listen: false).setRating(rating);
           },
         ),
         SizedBox(
@@ -278,24 +270,11 @@ class CustomBackButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     void previousQuestion() {
-      Results results = Provider.of<Results>(context, listen: false);
-      Ratingbarstate ratingbarstate = Provider.of<Ratingbarstate>(context, listen: false);
-      RadioButtonState radioButtonState = Provider.of<RadioButtonState>(context, listen: false);
-      QuestionsProvider questionsProvider = Provider.of<QuestionsProvider>(context, listen: false);
+      QuestionsProvider q = Provider.of<QuestionsProvider>(context, listen: false);
 
-      int currentQIndex = questionsProvider.currentIndex;
-      if (questionsProvider.canGoBack) {
-        Map<String, dynamic> resultPastQ = results.getResultAtIndex(currentQIndex - 1);
-        log.info('Back Button - Loading result: $resultPastQ');
-
-        if (resultPastQ['Qtype'] == QuestionType.rating) {
-          ratingbarstate.setInitialRating(resultPastQ['Qresult']);
-          questionsProvider.previousQuestion();
-        } else {
-          radioButtonState.onRadioButtonSelected(resultPastQ['Qresult']);
-          questionsProvider.previousQuestion();
-        }
-      }
+      log.info('Previous Button Clicked');
+      Provider.of<QuestionsProvider>(context, listen: false).previousQuestion();
+      log.info('Loading result for Q${q.currentIndex} - Result ${q.currentQuestion.result}');
     }
 
     return Padding(
@@ -327,41 +306,16 @@ class CustomNextButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     void nextQuestion() {
-      Results results = Provider.of<Results>(context, listen: false);
+      log.info('Next Button Clicked');
       QuestionsProvider questionsProvider = Provider.of<QuestionsProvider>(context, listen: false);
-      Ratingbarstate ratingbarstate = Provider.of<Ratingbarstate>(context, listen: false);
-      RadioButtonState radioButtonState = Provider.of<RadioButtonState>(context, listen: false);
-
-      int currentQIndex = questionsProvider.currentIndex;
-      QuestionBase currentQuestion = questionsProvider.currentQuestion;
-
-      // If unanswered question
-      if (currentQIndex >= results.resultsList.length) {
-        // Get result from correct State Provider
-
-        if (currentQuestion is QuestionRating) {
-          results.addResult(quesionType: currentQuestion.type, questionResult: ratingbarstate.selectedRating, questionIndex: questionsProvider.currentIndex);
-          ratingbarstate.resetRating();
-        } else {
-          results.addResult(quesionType: currentQuestion.type, questionResult: radioButtonState.selectedIndex, questionIndex: questionsProvider.currentIndex);
-          radioButtonState.resetSelection();
-        }
-        log.info('Next Button - Displaying unanswered Questions');
-        questionsProvider.nextQuestion();
+      if (questionsProvider.currentQuestion is Questionmultiplechoice) {
+        double result = Provider.of<RadioButtonState>(context, listen: false).selectedIndex.toDouble();
+        questionsProvider.nextQuestion(result);
       } else {
-        //Basically load result, and resave
-        Map<String, dynamic> resultNextQ = results.getResultAtIndex(currentQIndex);
-        log.info('Next Button - Loading result: $resultNextQ');
-        if (resultNextQ['Qtype'] == QuestionType.rating) {
-          ratingbarstate.setInitialRating(resultNextQ['Qresult']);
-          results.updateResult(quesionType: currentQuestion.type, questionResult: ratingbarstate.selectedRating, questionIndex: questionsProvider.currentIndex);
-        } else {
-          radioButtonState.onRadioButtonSelected(resultNextQ['Qresult']);
-          results.updateResult(quesionType: currentQuestion.type, questionResult: radioButtonState.selectedIndex, questionIndex: questionsProvider.currentIndex);
-        }
-
-        questionsProvider.nextQuestion();
+        double result = Provider.of<Ratingbarstate>(context, listen: false).saveRating();
+        questionsProvider.nextQuestion(result);
       }
+      Provider.of<QuestionsProvider>(context, listen: false).printQuestions();
     }
 
     //TODO: Set correct widhts for Floating Buttons.

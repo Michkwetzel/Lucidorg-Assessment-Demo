@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:front_survey_questions/helperClasses/results.dart';
+import 'package:front_survey_questions/changeNotifiers/radioButtonsState.dart';
+import 'package:front_survey_questions/changeNotifiers/ratingBarState.dart';
 import 'package:front_survey_questions/helperClasses/questionBase.dart';
 import 'package:front_survey_questions/helperClasses/questionMultipleChoice.dart';
 import 'package:front_survey_questions/helperClasses/questionRating.dart';
@@ -8,21 +9,24 @@ import 'package:front_survey_questions/components/components.dart';
 
 class QuestionsProvider extends ChangeNotifier {
   final Logger log = Logger('QuestionsProvider');
+  Ratingbarstate ratingBarState;
+  RadioButtonState radioButtonState;
 
-  QuestionsProvider(this._results);
-
-  // Dependant on results
-  Results _results;
+  QuestionsProvider({required this.ratingBarState, required this.radioButtonState});
 
   // Private fields
   List<QuestionBase> _questions = [];
-  String _topText = '';
+  String _TextHeading = '';
   int _currentIndex = -1; //Start at -1 because on first start click needs to load index = 0
+  double _ratingInitialState = 3;
+  int _radioInitialState = -1;
   Widget _currentQuestionCard = const Placeholder();
 
   // Getters
   Widget get currentQuestionCard => _currentQuestionCard;
-  String get topText => _topText;
+  String get textHeading => _TextHeading;
+  double get ratingInitialState => _ratingInitialState;
+  int get radioInitialState => _radioInitialState;
   int get questionLength => _questions.length;
   int get currentIndex => _currentIndex;
   bool get canGoBack => _currentIndex > 0;
@@ -32,12 +36,8 @@ class QuestionsProvider extends ChangeNotifier {
 
   //Setters
   void setTopText(String text) {
-    _topText = text;
+    _TextHeading = text;
     notifyListeners();
-  }
-
-  void updateResults(Results results) {
-    _results = results;
   }
 
   void setQuestions(List<QuestionBase> questions) {
@@ -68,9 +68,9 @@ class QuestionsProvider extends ChangeNotifier {
     }
   }
 
-  void printQuestions({int upTo = 5}) {
+  void printQuestions() {
     for (QuestionBase question in _questions) {
-      log.info(question.toString());
+      log.info(question.info());
     }
   }
 
@@ -85,11 +85,25 @@ class QuestionsProvider extends ChangeNotifier {
 
     try {
       if (currentQuestion is Questionmultiplechoice) {
-        _topText = currentQuestion.text;
+        _TextHeading = currentQuestion.textHeading;
         _currentQuestionCard = MultipleChoiceQuestionCard(options: currentQuestion.options);
+        if (currentQuestion.answered) {
+          _radioInitialState = currentQuestion.result.toInt();
+          radioButtonState.onRadioButtonSelected(currentQuestion.result.toInt());
+        } else {
+          _radioInitialState = -1;
+          radioButtonState.onRadioButtonSelected(-1);
+        }
       } else if (currentQuestion is QuestionRating) {
-        _topText = currentQuestion.textHeading;
-        _currentQuestionCard = RatingQuestionCard(questionSecondText: currentQuestion.text);
+        _TextHeading = currentQuestion.textHeading;
+        _currentQuestionCard = RatingQuestionCard(questionBody: currentQuestion.textBody);
+        if (currentQuestion.answered) {
+          _ratingInitialState = currentQuestion.result;
+          ratingBarState.setRating(currentQuestion.result);
+        } else {
+          _ratingInitialState = 3;
+          ratingBarState.setRating(3);
+        }
       } else {
         throw UnsupportedError('Unknown question type: ${currentQuestion.runtimeType}');
       }
@@ -99,13 +113,27 @@ class QuestionsProvider extends ChangeNotifier {
     }
   }
 
-  void nextQuestion() {
+  void saveResult(double result) {
+    // If result -1 then it is first card.
+    if (result == -1) {
+      return;
+    }
+    QuestionBase currentQuestion = _questions[_currentIndex];
+    log.info('Saving result ListIndex: $_currentIndex, Q${currentQuestion.index} Result: $result');
+
+    currentQuestion.result = result;
+    currentQuestion.answered = true;
+  }
+
+  void nextQuestion(double result) {
     if (!canGoForward) {
       log.warning('Cannot go to next question: already at last question');
       return;
     }
+    saveResult(result);
     _currentIndex++;
     setCurrentQuestionCard(_currentIndex);
+    log.info('Displayd next Card - ListIndex $_currentIndex, Q${currentQuestion.index}, answered: ${currentQuestion.answered}, Result ${currentQuestion.result}');
   }
 
   void previousQuestion() {
@@ -113,13 +141,15 @@ class QuestionsProvider extends ChangeNotifier {
       log.warning('Cannot go to previous question: already at first question');
       return;
     }
+
     _currentIndex--;
     setCurrentQuestionCard(_currentIndex);
+    log.info('Displayd next Card - Q$_currentIndex, unasnwered?: ${currentQuestion.answered}, Result ${currentQuestion.result}');
   }
 
   void reset() {
     _questions.clear();
-    _topText = '';
+    _TextHeading = '';
     _currentIndex = -1;
     _currentQuestionCard = const Placeholder();
     notifyListeners();
