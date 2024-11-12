@@ -65,6 +65,14 @@ const kBodyTextStyle = TextStyle(
   decoration: TextDecoration.none,
 );
 
+const kBottomModalSheetTextStyle = TextStyle(
+  fontFamily: 'Nunito',
+  fontSize: 18,
+  fontWeight: FontWeight.w600,
+  color: Color.fromARGB(255, 108, 108, 108),
+  decoration: TextDecoration.none,
+);
+
 const kRatingQTextStyle = TextStyle(
   fontFamily: 'Noto Sans',
   fontSize: 22,

@@ -13,20 +13,23 @@ class Mainscreen extends StatelessWidget {
     return Center(
       child: ConstrainedBox(
         constraints: BoxConstraints(maxWidth: 600),
-        child: Stack(
-          children: [
-            MainComponentLayout(),
-            Align(
-              alignment: Alignment.bottomLeft,
-              child: CustomBackButton(
-                onPressed: () {},
+        child: Scaffold(
+          backgroundColor: Colors.white,
+          body: Stack(
+            children: [
+              MainComponentLayout(),
+              Align(
+                alignment: Alignment.bottomLeft,
+                child: CustomBackButton(
+                  onPressed: () {},
+                ),
               ),
-            ),
-            Align(
-              alignment: Alignment.bottomRight,
-              child: CustomNextButton(),
-            )
-          ],
+              Align(
+                alignment: Alignment.bottomRight,
+                child: CustomNextButton(),
+              )
+            ],
+          ),
         ),
       ),
     );
@@ -47,7 +50,9 @@ class MainComponentLayout extends StatelessWidget {
           builder: (context, questionsProvider, child) {
             return TopComponent(
               text: questionsProvider.textHeading,
-              showCloseIcon: true,
+              hasExtraText: questionsProvider.hasExtraText,
+              textExtra: questionsProvider.extraText,
+              questionType: questionsProvider.currentQuestionType,
             );
           },
         ),

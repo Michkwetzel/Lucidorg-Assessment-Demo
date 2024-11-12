@@ -81,135 +81,135 @@ class FirestoreService {
     Map<String, Map<String, dynamic>> ratingQuestions = {
       'q1': {
         'index': 1,
-        'textHeading': 'Everyone in Test Company ...',
+        'textHeading': 'Everyone in Test Company...',
         'textBody': 'knows and understands the company\'s purpose, mission, vision and values.',
         'textExtra': 'Purpose defines why a company exists, while mission defines what the company does, vision defines where it wants to go and values define how it operates.',
       },
       'q2': {
         'index': 2,
-        'textHeading': 'Everyone in Test Company ...',
+        'textHeading': 'Everyone in Test Company...',
         'textBody': 'knows the growth path over the next 2 years including budgets, goals and milestones.',
         'textExtra':
             'Growth path defines where the company should be in the next 2 years as well as milestones, budgets and focus areas. This allows employees to understand why the company is making decisions to achieve long term growth.'
       },
       'q3': {
         'index': 3,
-        'textHeading': 'Everyone in Test Company ...',
+        'textHeading': 'Everyone in Test Company...',
         'textBody': 'knows the department structure, whom to go to for questions and whom to work with cross-functionally to solve problems.',
         'textExtra': 'Cross-functional work defines how different departments work together to achieve company goals.'
       },
       'q4': {
         'index': 4,
-        'textHeading': 'Everyone in Test Company ...',
+        'textHeading': 'Everyone in Test Company...',
         'textBody': 'tracks collaborative KPIs, surfaces them, drives action from them and everyone understands which departments are involved with each KPI.',
         'textExtra':
             'Collaborative KPI\'s clearly define how every department affects a KPI. When employees understand how their work impacts a specific metric, each role feels more ownership in the success of a company.',
       },
       'q5': {
         'index': 5,
-        'textHeading': 'Everyone in Test Company ...',
+        'textHeading': 'Everyone in Test Company...',
         'textBody': 'has cross-functional team leaders assigned to ensuring departments and people are all working towards the same goals.',
       },
       'q6': {
         'index': 6,
-        'textHeading': 'Test Company ...',
+        'textHeading': 'Test Company...',
         'textBody': 'fosters a culture of open communication and collaboration, contributing to employee engagement and productivity.',
       },
       'q7': {
         'index': 7,
-        'textHeading': 'Test Company ...',
+        'textHeading': 'Test Company...',
         'textBody': 'provides learning and development opportunities for employees to advance and develop their skills within the organization.',
       },
       'q8': {
         'index': 8,
-        'textHeading': 'Test Company ...',
+        'textHeading': 'Test Company...',
         'textBody': 'provides an outline of all departmental roles and responsibilities across the company and trains all new hires, team leads, and leaders on roles & responsibilities.',
       },
       'q9': {
         'index': 9,
-        'textHeading': 'Test Company ...',
+        'textHeading': 'Test Company...',
         'textBody': 'has communication channels in place for employees to share ideas and concerns.',
       },
       'q10': {
         'index': 10,
-        'textHeading': 'Test Company ...',
+        'textHeading': 'Test Company...',
         'textBody': 'sets aside budget, time, and leadership to drive engagement across the entire company.',
       },
       'q11': {
         'index': 11,
-        'textHeading': 'Test Company and it\'s leadership team ...',
+        'textHeading': 'Test Company and it\'s leadership team...',
         'textBody': 'Efficiently distributes information to create a culture of cross-collaborative decision-making.',
         'textExtra': 'Cross-collaborative decision-making defines how different people from different departments work together to achieve the companies goals.',
       },
       'q12': {
         'index': 12,
-        'textHeading': 'Test Company and it\'s leadership team ...',
+        'textHeading': 'Test Company and it\'s leadership team...',
         'textBody': 'Includes cross-functional teams to drive the decision and implementation of technology systems and usage across the company.',
       },
       'q13': {
         'index': 13,
-        'textHeading': 'Test Company and it\'s leadership team ...',
+        'textHeading': 'Test Company and it\'s leadership team...',
         'textBody': 'Provides clearly defined processes and technology to support employee productivity and engagement.',
       },
       'q14': {
         'index': 14,
-        'textHeading': 'Test Company and it\'s leadership team ...',
+        'textHeading': 'Test Company and it\'s leadership team...',
         'textBody': 'Has a forward-looking tech strategy in place to support current operations and support scale without creating tech-debt.',
       },
       'q15': {
         'index': 15,
-        'textHeading': 'Test Company and it\'s leadership team ...',
+        'textHeading': 'Test Company and it\'s leadership team...',
         'textBody': 'Runs and organizes meetings efficiently with clear agendas, goals and outcomes.',
       },
       'q16': {
         'index': 16,
-        'textHeading': 'Test Company ...',
+        'textHeading': 'Test Company...',
         'textBody': 'Has the right leaders, in the right roles that drive a culture of  leadership development with all staff.',
         'textExtra': 'Leadership is a function of motivating people to learn and develop into leaders themselves, while at the same time supporting employee success and learning.'
       },
       'q17': {
         'index': 17,
-        'textHeading': 'Test Company ...',
+        'textHeading': 'Test Company...',
         'textBody': 'Drives a culture of reverse accountability (staff holding leaders accountable) and provides a system for anonymous structured feedback.',
       },
       'q18': {
         'index': 18,
-        'textHeading': 'Test Company ...',
+        'textHeading': 'Test Company...',
         'textBody': 'Has continuous cross-functional leadership training for all executives, department leads and anyone leading people in the organization.',
       },
       'q19': {
         'index': 19,
-        'textHeading': 'Test Company ...',
+        'textHeading': 'Test Company...',
         'textBody': 'Has moved away from a hierarchical management structure to an autonomous leadership and department structure where management time is reduced and decisions are driven by data.',
       },
       'q20': {
         'index': 20,
-        'textHeading': 'Test Company ...',
+        'textHeading': 'Test Company...',
         'textBody': 'Has a culture of accountable, autonomous leadership with an understanding of the difference of management and leadership.',
       },
       'q21': {
         'index': 21,
-        'textHeading': 'Test Company ...',
+        'textHeading': 'Test Company...',
         'textBody': 'Is committed to creating a healthy, motivational, and learning-oriented workplace.',
       },
       'q22': {
         'index': 22,
-        'textHeading': 'Test Company ...',
+        'textHeading': 'Test Company...',
         'textBody': 'Is committed to customer satisfaction and understands that employee satisfaction directly affects customer success.',
       },
       'q23': {
         'index': 23,
-        'textHeading': 'Test Company ...',
+        'textHeading': 'Test Company...',
         'textBody': 'Is innovative and prepared to be able to adapt to market changes quickly.',
       },
       'q24': {
         'index': 24,
-        'textHeading': 'Test Company ...',
+        'textHeading': 'Test Company...',
         'textBody': 'Is readily prepared to scale efficiently with little organizational friction.',
       },
       'q25': {
         'index': 25,
-        'textHeading': 'Test Company ...',
+        'textHeading': 'Test Company...',
         'textBody': 'has systems in place to support and reward employees who uphold company values and take action against employees who don\'t support the values.',
       },
     };

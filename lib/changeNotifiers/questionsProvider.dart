@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:front_survey_questions/changeNotifiers/radioButtonsState.dart';
 import 'package:front_survey_questions/changeNotifiers/ratingBarState.dart';
+import 'package:front_survey_questions/enums.dart';
 import 'package:front_survey_questions/helperClasses/questionBase.dart';
 import 'package:front_survey_questions/helperClasses/questionMultipleChoice.dart';
 import 'package:front_survey_questions/helperClasses/questionRating.dart';
@@ -21,6 +22,7 @@ class QuestionsProvider extends ChangeNotifier {
   double _ratingInitialState = 3;
   int _radioInitialState = -1;
   Widget _currentQuestionCard = const Placeholder();
+  bool _showExtraText = false;
 
   // Getters
   Widget get currentQuestionCard => _currentQuestionCard;
@@ -32,6 +34,9 @@ class QuestionsProvider extends ChangeNotifier {
   bool get canGoBack => _currentIndex > 0;
   bool get canGoForward => _currentIndex < _questions.length - 1;
   QuestionBase get currentQuestion => _questions[_currentIndex];
+  QuestionType get currentQuestionType => currentQuestion.type;
+  bool get hasExtraText => currentQuestion.textExtra != null;
+  String get extraText => currentQuestion.textExtra ?? '';
   List<QuestionBase> get questions => List.unmodifiable(_questions);
 
   //Setters
@@ -86,7 +91,9 @@ class QuestionsProvider extends ChangeNotifier {
     try {
       if (currentQuestion is Questionmultiplechoice) {
         _textHeading = currentQuestion.textHeading;
-        _currentQuestionCard = MultipleChoiceQuestionCard(options: currentQuestion.options);
+        _currentQuestionCard = MultipleChoiceQuestionCard(
+          options: currentQuestion.options,
+        );
         if (currentQuestion.answered) {
           _radioInitialState = currentQuestion.result.toInt();
           radioButtonState.onRadioButtonSelected(currentQuestion.result.toInt());
@@ -96,10 +103,12 @@ class QuestionsProvider extends ChangeNotifier {
         }
       } else if (currentQuestion is QuestionRating) {
         _textHeading = currentQuestion.textHeading;
-        _currentQuestionCard = RatingQuestionCard(questionBody: currentQuestion.textBody);
+        _currentQuestionCard = RatingQuestionCard(questionBody: currentQuestion.textBody, hasExtraText: hasExtraText, extraText: extraText);
         if (currentQuestion.answered) {
+          print(currentQuestion.result.toInt());
           _ratingInitialState = currentQuestion.result;
           ratingBarState.setRating(currentQuestion.result);
+          print(_ratingInitialState);
         } else {
           _ratingInitialState = 3;
           ratingBarState.setRating(3);
@@ -143,15 +152,16 @@ class QuestionsProvider extends ChangeNotifier {
     }
 
     _currentIndex--;
+    ratingBarState.resetRating();
     setCurrentQuestionCard(_currentIndex);
-    log.info('Displayd next Card - Q$_currentIndex, unasnwered?: ${currentQuestion.answered}, Result ${currentQuestion.result}');
+    log.info('Displayd next Card - Q$_currentIndex, Asnwered: ${currentQuestion.answered}, Result ${currentQuestion.result}');
   }
 
   void reset() {
-    _questions.clear();
+    //_questions.clear();
     _textHeading = '';
     _currentIndex = -1;
     _currentQuestionCard = const Placeholder();
-    notifyListeners();
+    //notifyListeners();
   }
 }

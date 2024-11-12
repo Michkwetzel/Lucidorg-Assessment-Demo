@@ -18,12 +18,6 @@ class Ratingbarstate extends ChangeNotifier {
     notifyListeners();
   }
 
-  void setInitialRating(double initialRating) {
-    _initialRating = initialRating;
-    _selectedRating = initialRating;
-    notifyListeners();
-  }
-
   double saveRating() {
     double selectedRating = _selectedRating;
     resetRating();

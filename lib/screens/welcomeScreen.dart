@@ -15,11 +15,9 @@ class WelcomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Load Questiosn from Firestore
     FirestoreService firestoreService = Provider.of<FirestoreService>(context, listen: false);
-
-    //gets Questions
     initGetQuestions(firestoreService);
-
     return WelcomeScreenComponentLayout();
   }
 }
