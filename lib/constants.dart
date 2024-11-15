@@ -43,17 +43,17 @@ const kH3TextStyle = TextStyle(
 );
 
 const kWelcomeScreenH1TextStyle = TextStyle(
-  fontFamily: 'Noto Sans',
-  fontSize: 44,
-  color: Color(0xFFFFFFFF),
-  fontWeight: FontWeight.w400,
+  fontFamily: 'Nunito',
+  fontSize: 24,
+  color: Color.fromARGB(255, 0, 0, 0),
+  fontWeight: FontWeight.w600,
   decoration: TextDecoration.none,
 );
 
 const kWelcomeScreenH2TextStyle = TextStyle(
   fontFamily: 'Noto Sans',
-  fontSize: 24,
-  color: Color(0xFFFFFFFF),
+  fontSize: 18,
+  color: Color.fromARGB(255, 0, 0, 0),
   fontWeight: FontWeight.w400,
   decoration: TextDecoration.none,
 );
@@ -75,7 +75,7 @@ const kBottomModalSheetTextStyle = TextStyle(
 
 const kRatingQTextStyle = TextStyle(
   fontFamily: 'Noto Sans',
-  fontSize: 22,
+  fontSize: 20,
   color: Color(0xFF343434),
   fontWeight: FontWeight.w400,
   decoration: TextDecoration.none,

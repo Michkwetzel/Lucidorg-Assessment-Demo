@@ -28,44 +28,50 @@ class WelcomeScreenComponentLayout extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFF3F94FF),
+      backgroundColor: Color.fromARGB(255, 255, 255, 255),
       body: Center(
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 24),
-          child: Container(
-            constraints: BoxConstraints(maxWidth: 600),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Image.asset(
-                  'assets/logo/efficiency-1stLogo.png',
-                  width: 150,
+          padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 24),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              SizedBox(
+                height: 1,  
+              ),
+              Image.asset(
+                'assets/logo/efficiency-1stLogo.png',
+                width: 150,
+              ),
+              Container(
+                constraints: BoxConstraints(maxWidth: 350),
+                decoration: BoxDecoration(
+                  //border: Border.all(color: Colors.black, width: 0.6, style: BorderStyle.solid),
+                  boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.20), blurRadius: 4)],
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
                 ),
-                Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      'Welcome to the Survey',
-                      style: kWelcomeScreenH1TextStyle,
-                      textAlign: TextAlign.center,
-                    ),
-                    Text(
-                      'Answers are saved anonymously. If you exit before finishing, your result will not be saved',
-                      style: kWelcomeScreenH2TextStyle,
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text('Welcome to the Assessment', style: kWelcomeScreenH1TextStyle),
+                      SizedBox(height: 8),
+                      Text('Answers are saved anonymously. If you exit before finishing, your result will not be saved', style: kWelcomeScreenH2TextStyle),
+                      SizedBox(height: 24),
+                      CustomStartButton(
+                        onPressed: () {
+                          //Provider.of<FirestoreService>(context, listen: false).addQuestiontoDB();
+                          log.info('Start Button pressed');
+                          Provider.of<QuestionsProvider>(context, listen: false).nextQuestion(-1);
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => Mainscreen()));
+                        },
+                      )
+                    ],
+                  ),
                 ),
-                CustomStartButton(
-                  onPressed: () {
-                    //Provider.of<FirestoreService>(context, listen: false).addQuestiontoDB();
-                    log.info('Start Button pressed');
-                    Provider.of<QuestionsProvider>(context, listen: false).nextQuestion(-1);
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => Mainscreen()));
-                  },
-                )
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
