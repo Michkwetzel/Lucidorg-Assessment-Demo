@@ -6,6 +6,7 @@ import 'package:front_survey_questions/changeNotifiers/ratingBarState.dart';
 import 'package:front_survey_questions/constants.dart';
 import 'package:front_survey_questions/enums.dart';
 import 'package:front_survey_questions/helperClasses/questionMultipleChoice.dart';
+import 'package:front_survey_questions/screens/finalScreen.dart';
 import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
 
@@ -251,10 +252,14 @@ class CustomProgressBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LinearProgressIndicator(
-      value: 0.8,
-      backgroundColor: Color(0xffDADADA),
-      color: Color(0xff1FB707),
+    return Consumer<QuestionsProvider>(
+      builder: (context, questionsProvider, child) {
+        return LinearProgressIndicator(
+          value: questionsProvider.currentIndex / questionsProvider.questionLength,
+          backgroundColor: Color(0xffDADADA),
+          color: Color(0xff1FB707),
+        );
+      },
     );
   }
 }
@@ -279,11 +284,11 @@ class TopComponent extends StatelessWidget {
       child: ConstrainedBox(
         constraints: BoxConstraints(maxWidth: desktop ? 500 : 300),
         child: Row(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: hasExtraText && questionType == QuestionType.multipleChoice ? MainAxisAlignment.spaceBetween : MainAxisAlignment.center,
+          //mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: hasExtraText && questionType == QuestionType.multipleChoice ? MainAxisAlignment.spaceBetween : MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-              Flexible(
+            Flexible(
               child: Text(
                 text,
                 style: kH2TextStyle,
@@ -363,38 +368,49 @@ class CustomNextButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     void nextQuestion() {
-      log.info('Next Button Clicked');
-      QuestionsProvider questionsProvider = Provider.of<QuestionsProvider>(context, listen: false);
-      if (questionsProvider.currentQuestion is Questionmultiplechoice) {
-        double result = Provider.of<RadioButtonState>(context, listen: false).selectedIndex.toDouble();
-        questionsProvider.nextQuestion(result);
+      if (Provider.of<QuestionsProvider>(context, listen: false).canGoForward) {
+        log.info('Next Button Clicked');
+        QuestionsProvider questionsProvider = Provider.of<QuestionsProvider>(context, listen: false);
+        if (questionsProvider.currentQuestion is Questionmultiplechoice) {
+          double result = Provider.of<RadioButtonState>(context, listen: false).selectedIndex.toDouble();
+          questionsProvider.nextQuestion(result);
+        } else {
+          double result = Provider.of<Ratingbarstate>(context, listen: false).saveRating();
+          questionsProvider.nextQuestion(result);
+        }
+        Provider.of<QuestionsProvider>(context, listen: false).printQuestions();
       } else {
-        double result = Provider.of<Ratingbarstate>(context, listen: false).saveRating();
-        questionsProvider.nextQuestion(result);
+        Navigator.push(context, MaterialPageRoute(builder: (context) => Finalscreen()));
       }
-      Provider.of<QuestionsProvider>(context, listen: false).printQuestions();
     }
 
     //TODO: Set correct widhts for Floating Buttons.
     return Padding(
       padding: MediaQuery.of(context).size.width > 600 ? const EdgeInsets.symmetric(vertical: 32) : const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
-      child: SizedBox(
-        width: 120 * 0.9,
-        height: 55 * 0.9,
+      child: Container(
+        //constraints: BoxConstraints(maxWidth: 150, maxHeight: 50),
         child: MaterialButton(
           onPressed: () => nextQuestion(),
           color: Color(0xFF3F94FF),
           elevation: 4,
-          padding: EdgeInsets.zero,
+          padding: EdgeInsets.all(20),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
-                "Next",
-                style: TextStyle(color: Colors.white, fontFamily: 'Noto Sans', fontSize: 22 * 0.9),
+              Consumer<QuestionsProvider>(
+                builder: (context, questionsProvider, child) {
+                  String buttonText = "Next";
+                  if (!questionsProvider.canGoForward) {
+                    buttonText = "Submit";
+                  }
+                  return Text(
+                    buttonText,
+                    style: TextStyle(color: Colors.white, fontFamily: 'Noto Sans', fontSize: 22 * 0.9),
+                  );
+                },
               ),
               const Icon(Icons.navigate_next_rounded, color: Colors.white, size: 24 * 0.9)
             ],
@@ -411,29 +427,25 @@ class CustomStartButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+    return ConstrainedBox(
+      constraints: BoxConstraints(maxWidth: 300),
       child: MaterialButton(
         onPressed: onPressed,
-        color: Color(0xFFFFFFFF),
+        color: Color(0xFF3F94FF),
         elevation: 4,
-        padding: EdgeInsets.zero,
+        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
         ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 20),
-          child: Row(
-            children: [
-              Expanded(
-                child: Text(
-                  textAlign: TextAlign.center,
-                  "Start",
-                  style: TextStyle(color: Colors.black, fontFamily: 'Noto Sans', fontSize: 22),
-                ),
-              ),
-            ],
-          ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              textAlign: TextAlign.center,
+              "Start",
+              style: TextStyle(color: const Color.fromARGB(255, 255, 255, 255), fontFamily: 'Noto Sans', fontSize: 22),
+            ),
+          ],
         ),
       ),
     );

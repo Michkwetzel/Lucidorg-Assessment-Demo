@@ -10,12 +10,19 @@ class Mainscreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: ConstrainedBox(
-        constraints: BoxConstraints(maxWidth: 600),
-        child: Scaffold(
-          backgroundColor: Colors.white,
-          body: Stack(
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: Center(
+        child: Container(
+          // margin: EdgeInsets.all(24),
+          // padding: EdgeInsets.all(24),
+          // decoration: BoxDecoration(
+          //   color: Colors.white,
+          //   borderRadius: BorderRadius.circular(16),
+          //   boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.20), blurRadius: 2)],
+          // ),
+          constraints: BoxConstraints(maxWidth: 550),
+          child: Stack(
             children: [
               MainComponentLayout(),
               Align(
