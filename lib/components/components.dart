@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:front_survey_questions/changeNotifiers/questionsProvider.dart';
 import 'package:front_survey_questions/changeNotifiers/radioButtonsState.dart';
 import 'package:front_survey_questions/changeNotifiers/ratingBarState.dart';
@@ -54,23 +53,19 @@ class CustomRatingBar extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Consumer<QuestionsProvider>(
-          builder: (context, questionsProvider, child) {
-            return RatingBar.builder(
-              itemSize: 70,
-              initialRating: questionsProvider.ratingInitialState,
-              itemCount: 5,
-              itemBuilder: (context, index) {
-                return RatingButton(
-                  index: index + 1,
-                );
-              },
-              onRatingUpdate: (rating) {
-                Provider.of<Ratingbarstate>(context, listen: false).setRating(rating);
-              },
-            );
-          },
-        ),
+        Consumer<Ratingbarstate>(builder: (context, rantingBarState, child) {
+          final List<int> indexList = [1, 2, 3, 4, 5];
+          return Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: indexList.map((index) {
+              return RatingButton(
+                index: index,
+                selected: index == rantingBarState.selectedRating,
+              );
+            }).toList(),
+          );
+        }),
+        SizedBox(height: 15),
         SizedBox(
           width: 335,
           child: Row(
@@ -107,9 +102,18 @@ class InfoButton extends StatelessWidget {
                   padding: EdgeInsets.all(32),
                   child: Consumer<QuestionsProvider>(
                     builder: (context, questionsProvider, child) {
-                      return Text(
-                        questionsProvider.extraText,
-                        style: kBottomModalSheetTextStyle,
+                      return Container(
+                        constraints: BoxConstraints(maxWidth: 488),
+                        child: Row(
+                          children: [
+                            Flexible(
+                              child: Text(
+                                questionsProvider.extraText,
+                                style: kBottomModalSheetTextStyle,
+                              ),
+                            ),
+                          ],
+                        ),
                       );
                     },
                   ),
@@ -127,29 +131,28 @@ class InfoButton extends StatelessWidget {
 
 class RatingButton extends StatelessWidget {
   final int index;
-  const RatingButton({super.key, required this.index});
+  final bool selected;
+  const RatingButton({super.key, required this.index, this.selected = true});
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 8),
-      child: Container(
-        decoration: BoxDecoration(
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.20), // Shadow color with opacity
-              blurRadius: 4, // Blur radius for a softer shadow
+      padding: EdgeInsets.symmetric(horizontal: 7),
+      child: GestureDetector(
+        onTap: () {
+          Provider.of<Ratingbarstate>(context, listen: false).setRating(index.toDouble());
+        },
+        child: Container(
+          decoration: selected
+              ? BoxDecoration(boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.20), blurRadius: 4)], color: Color(0xFFFFBB40), borderRadius: BorderRadius.circular(12)) // Selected
+              : BoxDecoration(boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.20), blurRadius: 4)], color: Color(0xFFFFFFFF), borderRadius: BorderRadius.circular(12)), // Not selected
+          height: 55,
+          width: 56,
+          child: Center(
+            child: Text(
+              index.toString(),
+              style: TextStyle(color: Color(0xFF000000), fontFamily: 'Noto Sans', fontSize: 17),
             ),
-          ],
-          color: Color(0xFFFFBB40),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        height: 55,
-        width: 60,
-        child: Center(
-          child: Text(
-            index.toString(),
-            style: TextStyle(color: Color(0xFF000000), fontFamily: 'Noto Sans', fontSize: 17),
           ),
         ),
       ),

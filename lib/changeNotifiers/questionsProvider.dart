@@ -22,7 +22,6 @@ class QuestionsProvider extends ChangeNotifier {
   double _ratingInitialState = 3;
   int _radioInitialState = -1;
   Widget _currentQuestionCard = const Placeholder();
-  bool _showExtraText = false;
 
   // Getters
   Widget get currentQuestionCard => _currentQuestionCard;
@@ -105,13 +104,14 @@ class QuestionsProvider extends ChangeNotifier {
         _textHeading = currentQuestion.textHeading;
         _currentQuestionCard = RatingQuestionCard(questionBody: currentQuestion.textBody, hasExtraText: hasExtraText, extraText: extraText);
         if (currentQuestion.answered) {
-          print(currentQuestion.result.toInt());
           _ratingInitialState = currentQuestion.result;
+
+
+          ratingBarState.setInitalRating(currentQuestion.result);
           ratingBarState.setRating(currentQuestion.result);
-          print(_ratingInitialState);
         } else {
-          _ratingInitialState = 3;
-          ratingBarState.setRating(3);
+          _ratingInitialState = 0;
+          ratingBarState.setRating(0);
         }
       } else {
         throw UnsupportedError('Unknown question type: ${currentQuestion.runtimeType}');
