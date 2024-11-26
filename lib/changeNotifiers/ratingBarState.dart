@@ -1,21 +1,25 @@
 import 'package:flutter/material.dart';
 
 class Ratingbarstate extends ChangeNotifier {
-  double _initialRating = 0;
+  double _initialRating = -1;
   Key _ratingBarKey = UniqueKey(); // key to force rebuild
-  double _selectedRating = 0;
+  double _selectedRating = -1;
+  bool _errorDisplay = false;
 
   double get initialRating => _initialRating;
   double get selectedRating => _selectedRating;
+  bool get errorDisplay => _errorDisplay;
   Key get ratingBarKey => _ratingBarKey;
 
-  void setRating(double rating) {
-    _selectedRating = rating;
+  void noAnswerSelected(){
+    _errorDisplay = true;
     notifyListeners();
   }
 
-  void resetRating() {
-    _ratingBarKey = UniqueKey();
+
+  void setRating(double rating) {
+    _selectedRating = rating;
+    _errorDisplay = false;
     notifyListeners();
   }
 
@@ -27,5 +31,10 @@ class Ratingbarstate extends ChangeNotifier {
     double selectedRating = _selectedRating;
     resetRating();
     return selectedRating;
+  }
+
+    void resetRating() {
+    _ratingBarKey = UniqueKey();
+    notifyListeners();
   }
 }

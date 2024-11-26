@@ -1,4 +1,3 @@
-import 'package:custom_rating_bar/custom_rating_bar.dart';
 import 'package:flutter/material.dart';
 import 'componentsOld.dart';
 
@@ -42,14 +41,7 @@ class _QuestionscreenState extends State<QuestionScreen> {
               SizedBox(
                 height: 20,
               ),
-              RatingBar(
-                size: 30,
-                alignment: Alignment.center,
-                initialRating: 0.0,
-                filledIcon: Icons.star_rounded,
-                emptyIcon: Icons.star_border_rounded,
-                onRatingChanged: (value) => print(value),
-              ),
+              
               SizedBox(
                 height: 20,
               ),
