@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:front_survey_questions/changeNotifiers/questionsProvider.dart';
 import 'package:front_survey_questions/changeNotifiers/radioButtonsState.dart';
@@ -45,11 +47,10 @@ class RatingQuestionCard extends StatelessWidget {
 class CustomRatingBar extends StatelessWidget {
   const CustomRatingBar({super.key});
 
-  ///Note here. I manually updated the Rating Bar class specific for this project.
-  ///If things change will have to change in the rating_bar.dart class
-  ///Dirty I know. but fake it till you make it. Will put in to do for future.
   @override
   Widget build(BuildContext context) {
+    bool errorDisplay = Provider.of<Ratingbarstate>(context).errorDisplay;
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -61,11 +62,21 @@ class CustomRatingBar extends StatelessWidget {
               return RatingButton(
                 index: index,
                 selected: index == rantingBarState.selectedRating,
+                errorDisplay: errorDisplay,
               );
             }).toList(),
           );
         }),
-        SizedBox(height: 15),
+        if (errorDisplay)
+          Padding(
+            padding: const EdgeInsets.only(top: 8.0, bottom: 2),
+            child: SizedBox(
+              width: 335,
+              child:
+                  Row(children: [Icon(Icons.dangerous, color: Colors.red[300]!, size: 20, grade: 0.5), SizedBox(width: 4), Text("Please select an answer", style: TextStyle(color: Colors.red[300]!))]),
+            ),
+          ),
+        if (!errorDisplay) SizedBox(height: 15),
         SizedBox(
           width: 335,
           child: Row(
@@ -83,6 +94,49 @@ class CustomRatingBar extends StatelessWidget {
           ),
         )
       ],
+    );
+  }
+}
+
+class RatingButton extends StatelessWidget {
+  final int index;
+  final bool selected;
+  final bool errorDisplay;
+  const RatingButton({super.key, required this.index, this.selected = true, this.errorDisplay = false});
+
+  BoxDecoration getDecoration() {
+    if (errorDisplay) {
+      // No selection made red error
+      return BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), border: Border.all(color: Colors.red[300]!, width: 1));
+    } else if (selected) {
+      // Box Selected
+      return BoxDecoration(boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.20), blurRadius: 4)], color: Color(0xFFFFBB40), borderRadius: BorderRadius.circular(12));
+    } else {
+      // Not selected
+      return BoxDecoration(boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.20), blurRadius: 4)], color: Color(0xFFFFFFFF), borderRadius: BorderRadius.circular(12));
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 7),
+      child: GestureDetector(
+        onTap: () {
+          Provider.of<Ratingbarstate>(context, listen: false).setRating(index.toDouble());
+        },
+        child: Container(
+          decoration: getDecoration(),
+          height: 55,
+          width: 56,
+          child: Center(
+            child: Text(
+              index.toString(),
+              style: TextStyle(color: Color(0xFF000000), fontFamily: 'Noto Sans', fontSize: 17),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
@@ -129,37 +183,6 @@ class InfoButton extends StatelessWidget {
   }
 }
 
-class RatingButton extends StatelessWidget {
-  final int index;
-  final bool selected;
-  const RatingButton({super.key, required this.index, this.selected = true});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 7),
-      child: GestureDetector(
-        onTap: () {
-          Provider.of<Ratingbarstate>(context, listen: false).setRating(index.toDouble());
-        },
-        child: Container(
-          decoration: selected
-              ? BoxDecoration(boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.20), blurRadius: 4)], color: Color(0xFFFFBB40), borderRadius: BorderRadius.circular(12)) // Selected
-              : BoxDecoration(boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.20), blurRadius: 4)], color: Color(0xFFFFFFFF), borderRadius: BorderRadius.circular(12)), // Not selected
-          height: 55,
-          width: 56,
-          child: Center(
-            child: Text(
-              index.toString(),
-              style: TextStyle(color: Color(0xFF000000), fontFamily: 'Noto Sans', fontSize: 17),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
 class MultipleChoiceQuestionCard extends StatelessWidget {
   final List<dynamic> options;
   final List<RadioButtonCard> radioButtonCards;
@@ -172,9 +195,63 @@ class MultipleChoiceQuestionCard extends StatelessWidget {
     }
   }
 
+  Expanded expandedListView() {
+    return Expanded(
+      child: ListView.builder(
+        itemCount: radioButtonCards.length + 2,
+        itemBuilder: (context, index) {
+          if (index == 0) {
+            return SizedBox(
+              height: 24,
+            );
+          } else if (index <= radioButtonCards.length) {
+            return radioButtonCards[index - 1];
+          } else {
+            return SizedBox(
+              height: 80,
+            );
+          }
+        },
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Expanded(
+    if (Provider.of<RadioButtonState>(context).errorDisplay) {
+      return Expanded(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(top: 12.0),
+              child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [Icon(Icons.dangerous, color: Colors.red[300]!, size: 20, grade: 0.5), SizedBox(width: 4), Text("Please select an answer", style: TextStyle(color: Colors.red[300]!))]),
+            ),
+            Expanded(
+              child: ListView.builder(
+                itemCount: radioButtonCards.length + 2,
+                itemBuilder: (context, index) {
+                  if (index == 0) {
+                    return SizedBox(
+                      height: 12,
+                    );
+                  } else if (index <= radioButtonCards.length) {
+                    return radioButtonCards[index - 1];
+                  } else {
+                    return SizedBox(
+                      height: 80,
+                    );
+                  }
+                },
+              ),
+            )
+          ],
+        ),
+      );
+    }
+    return Flexible(
       child: ListView.builder(
         itemCount: radioButtonCards.length + 2,
         itemBuilder: (context, index) {
@@ -219,7 +296,7 @@ class RadioButtonCard extends StatelessWidget {
         color: Colors.white,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
-          side: BorderSide(color: Color(0xFFCACACA)),
+          side: BorderSide(color: Provider.of<RadioButtonState>(context).errorDisplay ? Colors.red[300]! : Color(0xFFCACACA)),
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -379,9 +456,10 @@ class CustomNextButton extends StatelessWidget {
           questionsProvider.nextQuestion(result);
         } else {
           double result = Provider.of<Ratingbarstate>(context, listen: false).saveRating();
+          //print(result);
           questionsProvider.nextQuestion(result);
         }
-        Provider.of<QuestionsProvider>(context, listen: false).printQuestions();
+        //Provider.of<QuestionsProvider>(context, listen: false).printQuestions();
       } else {
         Navigator.push(context, MaterialPageRoute(builder: (context) => Finalscreen()));
       }

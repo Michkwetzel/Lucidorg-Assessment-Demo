@@ -19,7 +19,7 @@ class QuestionsProvider extends ChangeNotifier {
   List<QuestionBase> _questions = [];
   String _textHeading = '';
   int _currentIndex = -1; //Start at -1 because on first start click needs to load index = 0
-  double _ratingInitialState = 3;
+  double _ratingInitialState = -1;
   int _radioInitialState = -1;
   Widget _currentQuestionCard = const Placeholder();
 
@@ -106,12 +106,11 @@ class QuestionsProvider extends ChangeNotifier {
         if (currentQuestion.answered) {
           _ratingInitialState = currentQuestion.result;
 
-
           ratingBarState.setInitalRating(currentQuestion.result);
           ratingBarState.setRating(currentQuestion.result);
         } else {
-          _ratingInitialState = 0;
-          ratingBarState.setRating(0);
+          _ratingInitialState = -1;
+          ratingBarState.setRating(-1);
         }
       } else {
         throw UnsupportedError('Unknown question type: ${currentQuestion.runtimeType}');
@@ -123,8 +122,8 @@ class QuestionsProvider extends ChangeNotifier {
   }
 
   void saveResult(double result) {
-    // If result -1 then it is first card.
-    if (result == -1) {
+    // If result -2 then it is first card.
+    if (result == -2) {
       return;
     }
     QuestionBase currentQuestion = _questions[_currentIndex];
@@ -135,10 +134,16 @@ class QuestionsProvider extends ChangeNotifier {
   }
 
   void nextQuestion(double result) {
-    if (!canGoForward) {
-      log.warning('Cannot go to next question: already at last question');
+
+    // Not answered
+    if (result == -1) {
+      if (currentQuestion is QuestionRating) {ratingBarState.noAnswerSelected();}
+      else {radioButtonState.noAnswerSelected();}
+      log.info('Question $_currentIndex, not answered, Red border');
       return;
     }
+
+    // Answered
     saveResult(result);
     _currentIndex++;
     setCurrentQuestionCard(_currentIndex);

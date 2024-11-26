@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:custom_rating_bar/custom_rating_bar.dart';
 import 'package:front_survey_questions/constants.dart';
 
 class CardInstructions extends StatelessWidget {
@@ -94,11 +93,7 @@ class CardQuestion extends StatelessWidget {
               style: kCardQuestionTextStyle,
             ),
             SizedBox(height: 15),
-            RatingBar(
-              filledIcon: Icons.star_rounded,
-              emptyIcon: Icons.star_border_rounded,
-              onRatingChanged: (value) => print(value),
-            ),
+            
           ],
         ),
       ),

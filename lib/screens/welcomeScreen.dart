@@ -63,7 +63,7 @@ class WelcomeScreenComponentLayout extends StatelessWidget {
                         onPressed: () {
                           //Provider.of<FirestoreService>(context, listen: false).addQuestiontoDB();
                           log.info('Start Button pressed');
-                          Provider.of<QuestionsProvider>(context, listen: false).nextQuestion(-1);
+                          Provider.of<QuestionsProvider>(context, listen: false).nextQuestion(-2); //-2 for first card
                           Navigator.push(context, MaterialPageRoute(builder: (context) => Mainscreen()));
                         },
                       )
