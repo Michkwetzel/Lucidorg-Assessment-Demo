@@ -6,19 +6,74 @@ import 'package:front_survey_questions/services/firestoreService.dart';
 import 'package:provider/provider.dart';
 import 'mainScreen.dart';
 
-class WelcomeScreen extends StatelessWidget {
-  WelcomeScreen({super.key});
+class WelcomeScreen extends StatefulWidget {
+  const WelcomeScreen({super.key});
 
-  void initGetQuestions(FirestoreService firestoreService) async {
-    await firestoreService.getQuestions();
+  @override
+  _WelcomeScreenState createState() => _WelcomeScreenState();
+}
+
+class _WelcomeScreenState extends State<WelcomeScreen> {
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    initGetQuestions();
+  }
+
+  Future<void> initGetQuestions() async {
+    try {
+      FirestoreService firestoreService = Provider.of<FirestoreService>(context, listen: false);
+      await firestoreService.getQuestions();
+
+      // Update state to indicate loading is complete
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      // Handle potential errors
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to load questions: ${e.toString()}')),
+        );
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    // Load Questiosn from Firestore
-    FirestoreService firestoreService = Provider.of<FirestoreService>(context, listen: false);
-    initGetQuestions(firestoreService);
-    return WelcomeScreenComponentLayout();
+    return _isLoading ? LoadingScreen() : WelcomeScreenComponentLayout();
+  }
+}
+
+class LoadingScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset(
+              'assets/logo/efficiency-1stLogo.png',
+              width: 150,
+            ),
+            SizedBox(height: 24),
+            CircularProgressIndicator(
+              color: Colors.blue, // Customize color as needed
+            ),
+            SizedBox(height: 16),
+          ],
+        ),
+      ),
+    );
   }
 }
 
@@ -35,9 +90,7 @@ class WelcomeScreenComponentLayout extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              SizedBox(
-                height: 1,  
-              ),
+              SizedBox(height: 1),
               Image.asset(
                 'assets/logo/efficiency-1stLogo.png',
                 width: 150,
@@ -45,7 +98,6 @@ class WelcomeScreenComponentLayout extends StatelessWidget {
               Container(
                 constraints: BoxConstraints(maxWidth: 350),
                 decoration: BoxDecoration(
-                  //border: Border.all(color: Colors.black, width: 0.6, style: BorderStyle.solid),
                   boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.20), blurRadius: 4)],
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(16),
@@ -61,7 +113,6 @@ class WelcomeScreenComponentLayout extends StatelessWidget {
                       SizedBox(height: 24),
                       CustomStartButton(
                         onPressed: () {
-                          //Provider.of<FirestoreService>(context, listen: false).addQuestiontoDB();
                           log.info('Start Button pressed');
                           Provider.of<QuestionsProvider>(context, listen: false).nextQuestion(-2); //-2 for first card
                           Navigator.push(context, MaterialPageRoute(builder: (context) => Mainscreen()));

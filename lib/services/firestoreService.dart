@@ -9,6 +9,7 @@ import 'package:front_survey_questions/enums.dart';
 class FirestoreService {
   final log = Logger("FireStoreService");
   final QuestionsProvider questions;
+  bool doneLoadingQ = false;
   FirestoreService({required this.questions});
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
