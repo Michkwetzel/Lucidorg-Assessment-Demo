@@ -18,7 +18,7 @@ class QuestionsProvider extends ChangeNotifier {
   // Private fields
   List<QuestionBase> _questions = [];
   String _textHeading = '';
-  int _currentIndex = -1; //Start at -1 because on first start click needs to load index = 0
+  int _currentIndex = 25; //Start at -1 because on first start click needs to load index = 0
   double _ratingInitialState = -1;
   int _radioInitialState = -1;
   Widget _currentQuestionCard = const Placeholder();
@@ -134,20 +134,24 @@ class QuestionsProvider extends ChangeNotifier {
   }
 
   void nextQuestion(double result) {
-
     // Not answered
     if (result == -1) {
-      if (currentQuestion is QuestionRating) {ratingBarState.noAnswerSelected();}
-      else {radioButtonState.noAnswerSelected();}
+      if (currentQuestion is QuestionRating) {
+        ratingBarState.noAnswerSelected();
+      } else {
+        radioButtonState.noAnswerSelected();
+      }
       log.info('Question $_currentIndex, not answered, Red border');
       return;
     }
-
     // Answered
     saveResult(result);
-    _currentIndex++;
-    setCurrentQuestionCard(_currentIndex);
-    log.info('Displayd next Card - ListIndex $_currentIndex, Q${currentQuestion.index}, answered: ${currentQuestion.answered}, Result ${currentQuestion.result}');
+
+    if (_currentIndex < _questions.length - 1) {
+      _currentIndex++;
+      setCurrentQuestionCard(_currentIndex);
+      log.info('Displayd next Card - ListIndex $_currentIndex, Q${currentQuestion.index}, answered: ${currentQuestion.answered}, Result ${currentQuestion.result}');
+    }
   }
 
   void previousQuestion() {
@@ -160,6 +164,14 @@ class QuestionsProvider extends ChangeNotifier {
     ratingBarState.resetRating();
     setCurrentQuestionCard(_currentIndex);
     log.info('Displayd next Card - Q$_currentIndex, Asnwered: ${currentQuestion.answered}, Result ${currentQuestion.result}');
+  }
+
+  List<int> getResults() {
+    List<int> results = [];
+    for (QuestionBase question in _questions) {
+      results.add(question.result.toInt());
+    }
+    return results;
   }
 
   void reset() {

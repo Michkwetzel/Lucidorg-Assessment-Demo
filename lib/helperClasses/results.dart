@@ -18,7 +18,7 @@ class Results {
     };
 
     _resultsList.add(resultData);
-    //log.info('Results: $_resultsList');
+    log.info('Results: $_resultsList');
   }
 
   void updateResult({required QuestionType quesionType, required int questionIndex, required int questionResult}) {

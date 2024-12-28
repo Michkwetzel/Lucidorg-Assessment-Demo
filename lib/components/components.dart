@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:front_survey_questions/changeNotifiers/questionsProvider.dart';
 import 'package:front_survey_questions/changeNotifiers/radioButtonsState.dart';
@@ -448,22 +446,24 @@ class CustomNextButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     void nextQuestion() {
-      if (Provider.of<QuestionsProvider>(context, listen: false).canGoForward) {
-        log.info('Next Button Clicked');
-        QuestionsProvider questionsProvider = Provider.of<QuestionsProvider>(context, listen: false);
-        if (questionsProvider.currentQuestion is Questionmultiplechoice) {
-          double result = Provider.of<RadioButtonState>(context, listen: false).selectedIndex.toDouble();
-          questionsProvider.nextQuestion(result);
-        } else {
-          double result = Provider.of<Ratingbarstate>(context, listen: false).saveRating();
-          //print(result);
-          questionsProvider.nextQuestion(result);
-        }
-        //Provider.of<QuestionsProvider>(context, listen: false).printQuestions();
+      double result;
+      QuestionsProvider questionsProvider = Provider.of<QuestionsProvider>(context, listen: false);
+      log.info('Next Button Clicked');
+      if (questionsProvider.currentQuestion is Questionmultiplechoice) {
+        result = Provider.of<RadioButtonState>(context, listen: false).selectedIndex.toDouble();
       } else {
+        result = Provider.of<Ratingbarstate>(context, listen: false).saveRating();
+      }
+      questionsProvider.nextQuestion(result);
+      Provider.of<QuestionsProvider>(context, listen: false).printQuestions();
+
+      if (questionsProvider.currentIndex == questionsProvider.questionLength ) {
         Navigator.push(context, MaterialPageRoute(builder: (context) => Finalscreen()));
       }
     }
+
+    // double result = Provider.of<Ratingbarstate>(context, listen: false).saveRating();
+    // List<int> results = questionsProvider.getResults();
 
     //TODO: Set correct widhts for Floating Buttons.
     return Padding(

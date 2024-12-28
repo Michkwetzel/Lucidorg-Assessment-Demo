@@ -76,6 +76,10 @@ class FirestoreService {
     }
   }
 
+  void saveResults(){
+    
+  }
+
   void addQuestiontoDB() {
     //Used to add questions to DB
 
