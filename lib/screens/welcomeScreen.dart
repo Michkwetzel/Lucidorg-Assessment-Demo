@@ -114,7 +114,7 @@ class WelcomeScreenComponentLayout extends StatelessWidget {
                       CustomStartButton(
                         onPressed: () {
                           log.info('Start Button pressed');
-                          Provider.of<QuestionsProvider>(context, listen: false).nextQuestion(-2); //-2 for first card
+                          Provider.of<QuestionsProvider>(context, listen: false).nextQuestion();
                           Navigator.push(context, MaterialPageRoute(builder: (context) => Mainscreen()));
                         },
                       )
