@@ -44,6 +44,7 @@ dependencies:
     git:
       url: https://github.com/Michkwetzel/flutter_rating_bar_custom.git
       ref: main  # Use the branch
+  universal_html: ^2.2.4
 
 dev_dependencies:
   flutter_test:

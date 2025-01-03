@@ -6,6 +6,7 @@ import 'package:front_survey_questions/constants.dart';
 import 'package:front_survey_questions/enums.dart';
 import 'package:front_survey_questions/helperClasses/questionMultipleChoice.dart';
 import 'package:front_survey_questions/screens/finalScreen.dart';
+import 'package:front_survey_questions/services/firestoreService.dart';
 import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
 
@@ -446,20 +447,52 @@ class CustomNextButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     void nextQuestion() {
+      log.info('Next Button Clicked');
       double result;
       QuestionsProvider questionsProvider = Provider.of<QuestionsProvider>(context, listen: false);
-      log.info('Next Button Clicked');
+
+      // Go to first question
+      if (questionsProvider.currentIndex == -1) {
+        questionsProvider.nextQuestion();
+        return;
+      }
+
+      // Get selected answer
       if (questionsProvider.currentQuestion is Questionmultiplechoice) {
         result = Provider.of<RadioButtonState>(context, listen: false).selectedIndex.toDouble();
+        if (result == -1) {
+          //No answer selected
+          Provider.of<RadioButtonState>(context, listen: false).noAnswerSelected();
+          return;
+        }
       } else {
-        result = Provider.of<Ratingbarstate>(context, listen: false).saveRating();
+        //No answer selected
+        result = Provider.of<Ratingbarstate>(context, listen: false).getRating();
+        if (result == -1) {
+          Provider.of<Ratingbarstate>(context, listen: false).noAnswerSelected();
+          return;
+        }
       }
-      questionsProvider.nextQuestion(result);
-      Provider.of<QuestionsProvider>(context, listen: false).printQuestions();
+      questionsProvider.saveResult(result);
 
-      if (questionsProvider.currentIndex == questionsProvider.questionLength ) {
-        Navigator.push(context, MaterialPageRoute(builder: (context) => Finalscreen()));
+      if (questionsProvider.currentIndex < questionsProvider.questionLength - 1) {
+        questionsProvider.nextQuestion();
+      } else {
+        //Submit
+        final results = questionsProvider.getResults();
+        Provider.of<FirestoreService>(context, listen: false).saveResults(results);
+        try {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const FinalScreen(),
+            ),
+          );
+        } catch (e) {
+          print('Navigation error: $e');
+        }
       }
+      Provider.of<QuestionsProvider>(context, listen: false).printQuestions();
     }
 
     // double result = Provider.of<Ratingbarstate>(context, listen: false).saveRating();

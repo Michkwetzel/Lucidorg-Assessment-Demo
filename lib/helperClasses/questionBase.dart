@@ -26,6 +26,6 @@ class QuestionBase {
   }
 
   String info() {
-    return "q${index-1}, QuestionType: $type, Result: $result, Answered: $answered";
+    return "q${index}, QuestionType: $type, Result: $result, Answered: $answered";
   }
 }

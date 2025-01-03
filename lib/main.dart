@@ -2,12 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:front_survey_questions/changeNotifiers/questionsProvider.dart';
 import 'package:front_survey_questions/changeNotifiers/radioButtonsState.dart';
 import 'package:front_survey_questions/changeNotifiers/ratingBarState.dart';
+import 'package:front_survey_questions/screens/finalScreen.dart';
 import 'package:front_survey_questions/screens/welcomeScreen.dart';
 import 'package:front_survey_questions/services/firestoreService.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:logging/logging.dart';
+import 'package:universal_html/html.dart' as html; // Add this
+import 'package:flutter_web_plugins/flutter_web_plugins.dart'; // Add this
 
 Future<void> main() async {
   void initializeLogging() {
@@ -18,11 +21,16 @@ Future<void> main() async {
   }
 
   WidgetsFlutterBinding.ensureInitialized();
+  setUrlStrategy(PathUrlStrategy());
+
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
   initializeLogging();
+
+  final uri = Uri.parse(html.window.location.href);
+  final surveyToken = uri.queryParameters['token'];
 
   runApp(MultiProvider(
     providers: [
@@ -39,7 +47,7 @@ Future<void> main() async {
       Provider<FirestoreService>(
         create: (context) {
           final questionsProvider = Provider.of<QuestionsProvider>(context, listen: false);
-          return FirestoreService(questions: questionsProvider);
+          return FirestoreService(questions: questionsProvider, surveyToken: surveyToken);
         },
         lazy: true,
       )
@@ -61,6 +69,7 @@ class MyApp extends StatelessWidget {
         fontFamily: 'Nunito',
       ),
       home: WelcomeScreen(),
+      routes: {'/finalscreen': (context) => const FinalScreen()},
     );
   }
 }

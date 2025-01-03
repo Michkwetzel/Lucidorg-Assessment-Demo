@@ -18,7 +18,7 @@ class QuestionsProvider extends ChangeNotifier {
   // Private fields
   List<QuestionBase> _questions = [];
   String _textHeading = '';
-  int _currentIndex = 25; //Start at -1 because on first start click needs to load index = 0
+  int _currentIndex = 32; //Start at -1 because on first start click needs to load index = 0
   double _ratingInitialState = -1;
   int _radioInitialState = -1;
   Widget _currentQuestionCard = const Placeholder();
@@ -123,34 +123,16 @@ class QuestionsProvider extends ChangeNotifier {
 
   void saveResult(double result) {
     // If result -2 then it is first card.
-    if (result == -2) {
-      return;
-    }
-    QuestionBase currentQuestion = _questions[_currentIndex];
     log.info('Saving result ListIndex: $_currentIndex, Q${currentQuestion.index} Result: $result');
 
     currentQuestion.result = result;
     currentQuestion.answered = true;
   }
 
-  void nextQuestion(double result) {
-    // Not answered
-    if (result == -1) {
-      if (currentQuestion is QuestionRating) {
-        ratingBarState.noAnswerSelected();
-      } else {
-        radioButtonState.noAnswerSelected();
-      }
-      log.info('Question $_currentIndex, not answered, Red border');
-      return;
-    }
-    // Answered
-    saveResult(result);
-
-    if (_currentIndex < _questions.length - 1) {
+  void nextQuestion() {
+    if (_currentIndex < _questions.length) {
       _currentIndex++;
       setCurrentQuestionCard(_currentIndex);
-      log.info('Displayd next Card - ListIndex $_currentIndex, Q${currentQuestion.index}, answered: ${currentQuestion.answered}, Result ${currentQuestion.result}');
     }
   }
 
@@ -163,7 +145,6 @@ class QuestionsProvider extends ChangeNotifier {
     _currentIndex--;
     ratingBarState.resetRating();
     setCurrentQuestionCard(_currentIndex);
-    log.info('Displayd next Card - Q$_currentIndex, Asnwered: ${currentQuestion.answered}, Result ${currentQuestion.result}');
   }
 
   List<int> getResults() {

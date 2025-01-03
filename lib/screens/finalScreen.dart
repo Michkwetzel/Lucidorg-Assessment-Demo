@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:front_survey_questions/constants.dart';
 
-class Finalscreen extends StatelessWidget {
-  const Finalscreen({super.key});
+class FinalScreen extends StatelessWidget {
+  const FinalScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
