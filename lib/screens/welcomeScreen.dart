@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:front_survey_questions/changeNotifiers/questionsProvider.dart';
+import 'package:front_survey_questions/changeNotifiers/surveyInfoProvider.dart';
 import 'package:front_survey_questions/components/components.dart';
 import 'package:front_survey_questions/constants.dart';
+import 'package:front_survey_questions/screens/mainScreen.dart';
 import 'package:front_survey_questions/services/firestoreService.dart';
 import 'package:provider/provider.dart';
-import 'mainScreen.dart';
 
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key});
@@ -25,8 +26,14 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   Future<void> initGetQuestions() async {
     try {
       FirestoreService firestoreService = Provider.of<FirestoreService>(context, listen: false);
-      await firestoreService.getQuestions();
+      if (await firestoreService.getSurveyInfo()) {
+        print("1");
+        Provider.of<SurveyInfoProvider>(context, listen: false).inValid();
+      } else {
+                print("2");
 
+        await firestoreService.getQuestions();
+      }
       // Update state to indicate loading is complete
       if (mounted) {
         setState(() {
@@ -82,6 +89,9 @@ class WelcomeScreenComponentLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    SurveyInfoProvider surveyInfoProvider = Provider.of<SurveyInfoProvider>(context);
+    bool valid = !surveyInfoProvider.alreadyAnswered;
+
     return Scaffold(
       backgroundColor: Color.fromARGB(255, 255, 255, 255),
       body: Center(
@@ -104,22 +114,29 @@ class WelcomeScreenComponentLayout extends StatelessWidget {
                 ),
                 child: Padding(
                   padding: const EdgeInsets.all(24),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text('Welcome to the Assessment', style: kWelcomeScreenH1TextStyle),
-                      SizedBox(height: 8),
-                      Text('Answers are saved anonymously. If you exit before finishing, your result will not be saved', style: kWelcomeScreenH2TextStyle),
-                      SizedBox(height: 24),
-                      CustomStartButton(
-                        onPressed: () {
-                          log.info('Start Button pressed');
-                          Provider.of<QuestionsProvider>(context, listen: false).nextQuestion();
-                          Navigator.push(context, MaterialPageRoute(builder: (context) => Mainscreen()));
-                        },
-                      )
-                    ],
-                  ),
+                  child: valid
+                      ? Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text('Welcome to the Assessment', style: kWelcomeScreenH1TextStyle),
+                            SizedBox(height: 8),
+                            Text('Answers are saved anonymously. If you exit before finishing, your result will not be saved', style: kWelcomeScreenH2TextStyle),
+                            SizedBox(height: 24),
+                            CustomStartButton(
+                              onPressed: () {
+                                log.info('Start Button pressed');
+                                Provider.of<QuestionsProvider>(context, listen: false).nextQuestion();
+                                Provider.of<FirestoreService>(context, listen: false).surveyStarted();
+                                Navigator.push(context, MaterialPageRoute(builder: (context) => Mainscreen()));
+                              },
+                            )
+                          ],
+                        )
+                      : Column(
+                          children: [
+                            Text('Oops! It seems this link has already been used', style: kWelcomeScreenH2TextStyle),
+                          ],
+                        ),
                 ),
               ),
             ],

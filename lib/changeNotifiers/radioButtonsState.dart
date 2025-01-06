@@ -15,7 +15,6 @@ class RadioButtonState extends ChangeNotifier {
   void onRadioButtonSelected(int index) {
     _selectedIndex = index;
     _errorDisplay = false;
-
     notifyListeners();
   }
 

@@ -2,15 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:front_survey_questions/changeNotifiers/questionsProvider.dart';
 import 'package:front_survey_questions/changeNotifiers/radioButtonsState.dart';
 import 'package:front_survey_questions/changeNotifiers/ratingBarState.dart';
+import 'package:front_survey_questions/changeNotifiers/surveyInfoProvider.dart';
 import 'package:front_survey_questions/screens/finalScreen.dart';
 import 'package:front_survey_questions/screens/welcomeScreen.dart';
 import 'package:front_survey_questions/services/firestoreService.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:universal_html/js.dart';
 import 'firebase_options.dart';
 import 'package:logging/logging.dart';
-import 'package:universal_html/html.dart' as html; // Add this
-import 'package:flutter_web_plugins/flutter_web_plugins.dart'; // Add this
+import 'package:universal_html/html.dart' as html;
+import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 
 Future<void> main() async {
   void initializeLogging() {
@@ -28,13 +30,18 @@ Future<void> main() async {
   );
 
   initializeLogging();
+  String? surveyToken;
+  String? companyUID;
 
   final uri = Uri.parse(html.window.location.href);
-  final surveyToken = uri.queryParameters['token'];
+
+  surveyToken = uri.queryParameters['token1'];
+  companyUID = uri.queryParameters['token2'];
+  surveyToken = 'NP9BdeiJ64AYHmTi9oXy';
+  companyUID = 'dBR3TMXWGxm_LqJDXd7vkw';
 
   runApp(MultiProvider(
     providers: [
-      // Use ChangeNotifierProxyProvider because QuestionsProvider is ChangeNotifer
       ChangeNotifierProvider(create: (context) => RadioButtonState()),
       ChangeNotifierProvider(create: (context) => Ratingbarstate()),
       ChangeNotifierProvider(
@@ -43,11 +50,11 @@ Future<void> main() async {
           ratingBarState: context.read<Ratingbarstate>(),
         ),
       ),
-      // User ProxyProvider because Firestore is service class but depends on ChangeNotifer QuestionsProvider
+      ChangeNotifierProvider(create: (context) => SurveyInfoProvider(alreadyAnswered: false)),
       Provider<FirestoreService>(
         create: (context) {
           final questionsProvider = Provider.of<QuestionsProvider>(context, listen: false);
-          return FirestoreService(questions: questionsProvider, surveyToken: surveyToken);
+          return FirestoreService(questions: questionsProvider, surveyToken: surveyToken, companyUID: companyUID);
         },
         lazy: true,
       )

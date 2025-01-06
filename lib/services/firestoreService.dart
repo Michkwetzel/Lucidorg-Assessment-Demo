@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 import 'package:front_survey_questions/changeNotifiers/questionsProvider.dart';
 import 'package:front_survey_questions/helperClasses/questionMultipleChoice.dart';
 import 'package:front_survey_questions/helperClasses/questionRating.dart';
@@ -10,8 +11,12 @@ class FirestoreService {
   final log = Logger("FireStoreService");
   final QuestionsProvider questions;
   final String? surveyToken;
+  final String? companyUID;
   bool doneLoadingQ = false;
-  FirestoreService({required this.questions, required this.surveyToken});
+  DocumentReference<Map<String, dynamic>>? resultsDocRef;
+  String? latestAssessment;
+
+  FirestoreService({required this.questions, required this.surveyToken, required this.companyUID});
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
@@ -77,9 +82,7 @@ class FirestoreService {
     }
   }
 
-  void saveResults(List<int> results) {
-    // TODO: also get companyUID from URL. Actually ill send this to my back end. this will have access to this.
-
+  void saveResults(List<int> results) async {
     // Turn result list into Map with qNUmbers
     Map<String, int> resultsMap = {};
     for (int i = 0; i < results.length; i++) {
@@ -87,27 +90,21 @@ class FirestoreService {
       resultsMap['q$qNumber'] = results[i];
     }
 
-    Future<String?> getLatestTimestamp() async {
-      try {
-        final querySnapshot = await _firestore.collection('surveyData/dBR3TMXWGxm_LqJDXd7vkw/').orderBy(FieldPath.documentId, descending: true).limit(1).get();
+    resultsDocRef?.update({'results': resultsMap, 'finished': true});
+  }
 
-        if (querySnapshot.docs.isNotEmpty) {
-          return querySnapshot.docs.first.id; // This is your timestamp
-        }
+  void surveyStarted() async {
+    resultsDocRef?.update({'started': true});
+  }
 
-        return null; // Return null if collection is empty
-      } catch (e) {
-        print('Error fetching latest timestamp: $e');
-        return null;
-      }
-    }
-
-    Future<String?> assessmentCollection = getLatestTimestamp();
-
-    final resultsDoc = _firestore.collection('surveyData/dBR3TMXWGxm_LqJDXd7vkw/$assessmentCollection/results/data/').doc(surveyToken);
-    resultsDoc.update({'results': resultsMap});
-
-    // TODO: finish this
+  Future<bool> getSurveyInfo() async {
+    final companyDoc = await _firestore.collection('surveyData').doc(companyUID).get();
+    latestAssessment = companyDoc.data()?['latestSurvey'];
+    resultsDocRef = _firestore.collection('surveyData/$companyUID/$latestAssessment/results/data').doc(surveyToken);
+    final resultsDoc = await resultsDocRef?.get();
+    bool finished = resultsDoc?.data()?['finished'];
+    print(finished);
+    return finished;
   }
 
   void addQuestiontoDB() {

@@ -478,7 +478,7 @@ class CustomNextButton extends StatelessWidget {
       if (questionsProvider.currentIndex < questionsProvider.questionLength - 1) {
         questionsProvider.nextQuestion();
       } else {
-        //Submit
+        //Submit results
         final results = questionsProvider.getResults();
         Provider.of<FirestoreService>(context, listen: false).saveResults(results);
         try {
