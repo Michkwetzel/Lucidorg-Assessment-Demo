@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:front_survey_questions/changeNotifiers/questionsProvider.dart';
-import 'package:front_survey_questions/changeNotifiers/surveyInfoProvider.dart';
 import 'package:front_survey_questions/components/components.dart';
 import 'package:front_survey_questions/constants.dart';
+import 'package:front_survey_questions/exceptions.dart';
+import 'package:front_survey_questions/screens/errorScreen.dart';
 import 'package:front_survey_questions/screens/mainScreen.dart';
 import 'package:front_survey_questions/services/firestoreService.dart';
 import 'package:provider/provider.dart';
@@ -16,50 +17,72 @@ class WelcomeScreen extends StatefulWidget {
 
 class _WelcomeScreenState extends State<WelcomeScreen> {
   bool _isLoading = true;
+  bool _error = false;
+  String _errorText = '';
+  String _loadingText = "Validating Assessment";
 
   @override
   void initState() {
     super.initState();
-    initGetQuestions();
+    _initializeScreen();
   }
 
-  Future<void> initGetQuestions() async {
+  // Combined initialization method
+  Future<void> _initializeScreen() async {
     try {
-      FirestoreService firestoreService = Provider.of<FirestoreService>(context, listen: false);
-      if (await firestoreService.getSurveyInfo()) {
-        print("1");
-        Provider.of<SurveyInfoProvider>(context, listen: false).inValid();
-      } else {
-                print("2");
+      final firestoreService = Provider.of<FirestoreService>(context, listen: false);
 
-        await firestoreService.getQuestions();
+      // First check tokens
+      await firestoreService.checkTokens();
+
+      if (mounted) {
+        setState(() {
+          _loadingText = "Loading Survey";
+        });
       }
-      // Update state to indicate loading is complete
+
+      // Then get questions
+      await firestoreService.getQuestions();
+
       if (mounted) {
         setState(() {
           _isLoading = false;
         });
       }
+    } on SurveyException catch (e) {
+      _handleError(e.message);
     } catch (e) {
-      // Handle potential errors
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to load questions: ${e.toString()}')),
-        );
-      }
+      _handleError("Unexpected Error");
+    }
+  }
+
+  void _handleError(String message) {
+    if (mounted) {
+      setState(() {
+        _error = true;
+        _errorText = message;
+        _isLoading = false;
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return _isLoading ? LoadingScreen() : WelcomeScreenComponentLayout();
+    return _isLoading
+        ? LoadingScreen(_loadingText)
+        : _error
+            ? ErrorScreen(
+                _errorText,
+              )
+            : const WelcomeScreenComponentLayout();
   }
 }
 
 class LoadingScreen extends StatelessWidget {
+  final String loadingText;
+
+  const LoadingScreen(this.loadingText, {super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -72,11 +95,16 @@ class LoadingScreen extends StatelessWidget {
               'assets/logo/efficiency-1stLogo.png',
               width: 150,
             ),
-            SizedBox(height: 24),
-            CircularProgressIndicator(
-              color: Colors.blue, // Customize color as needed
+            const SizedBox(height: 24),
+            const CircularProgressIndicator(
+              color: Colors.blue,
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
+            Text(
+              loadingText,
+              style: Theme.of(context).textTheme.bodyLarge,
+              textAlign: TextAlign.center,
+            )
           ],
         ),
       ),
@@ -89,9 +117,6 @@ class WelcomeScreenComponentLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    SurveyInfoProvider surveyInfoProvider = Provider.of<SurveyInfoProvider>(context);
-    bool valid = !surveyInfoProvider.alreadyAnswered;
-
     return Scaffold(
       backgroundColor: Color.fromARGB(255, 255, 255, 255),
       body: Center(
@@ -114,29 +139,23 @@ class WelcomeScreenComponentLayout extends StatelessWidget {
                 ),
                 child: Padding(
                   padding: const EdgeInsets.all(24),
-                  child: valid
-                      ? Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text('Welcome to the Assessment', style: kWelcomeScreenH1TextStyle),
-                            SizedBox(height: 8),
-                            Text('Answers are saved anonymously. If you exit before finishing, your result will not be saved', style: kWelcomeScreenH2TextStyle),
-                            SizedBox(height: 24),
-                            CustomStartButton(
-                              onPressed: () {
-                                log.info('Start Button pressed');
-                                Provider.of<QuestionsProvider>(context, listen: false).nextQuestion();
-                                Provider.of<FirestoreService>(context, listen: false).surveyStarted();
-                                Navigator.push(context, MaterialPageRoute(builder: (context) => Mainscreen()));
-                              },
-                            )
-                          ],
-                        )
-                      : Column(
-                          children: [
-                            Text('Oops! It seems this link has already been used', style: kWelcomeScreenH2TextStyle),
-                          ],
-                        ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text('Welcome to the Assessment', style: kWelcomeScreenH1TextStyle),
+                      SizedBox(height: 8),
+                      Text('Answers are saved anonymously. If you exit before finishing, your result will not be saved', style: kWelcomeScreenH2TextStyle),
+                      SizedBox(height: 24),
+                      CustomStartButton(
+                        onPressed: () {
+                          log.info('Start Button pressed');
+                          Provider.of<QuestionsProvider>(context, listen: false).nextQuestion();
+                          Provider.of<FirestoreService>(context, listen: false).surveyStarted();
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => Mainscreen()));
+                        },
+                      )
+                    ],
+                  ),
                 ),
               ),
             ],

@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
 import 'package:front_survey_questions/changeNotifiers/questionsProvider.dart';
+import 'package:front_survey_questions/exceptions.dart';
 import 'package:front_survey_questions/helperClasses/questionMultipleChoice.dart';
 import 'package:front_survey_questions/helperClasses/questionRating.dart';
 import 'package:logging/logging.dart';
@@ -12,13 +12,11 @@ class FirestoreService {
   final QuestionsProvider questions;
   final String? surveyToken;
   final String? companyUID;
-  bool doneLoadingQ = false;
   DocumentReference<Map<String, dynamic>>? resultsDocRef;
-  String? latestAssessment;
+  String? latestSurveyDocName;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   FirestoreService({required this.questions, required this.surveyToken, required this.companyUID});
-
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   ///Method that reads latest version question doc from firestore
   ///Creates Question object for each q in doc map
@@ -97,14 +95,46 @@ class FirestoreService {
     resultsDocRef?.update({'started': true});
   }
 
-  Future<bool> getSurveyInfo() async {
-    final companyDoc = await _firestore.collection('surveyData').doc(companyUID).get();
-    latestAssessment = companyDoc.data()?['latestSurvey'];
-    resultsDocRef = _firestore.collection('surveyData/$companyUID/$latestAssessment/results/data').doc(surveyToken);
-    final resultsDoc = await resultsDocRef?.get();
-    bool finished = resultsDoc?.data()?['finished'];
-    print(finished);
-    return finished;
+  Future<void> checkTokens() async {
+    if (surveyToken == null || companyUID == null) {
+      //Check if token exists. if not. error
+      throw MissingTokenException();
+    }
+    // Now check if tokens are valid. firstly companyUID exists.
+    final docCompanyUIDSnapshot = await _firestore.collection('surveyData').doc(companyUID).get();
+    if (!docCompanyUIDSnapshot.exists) {
+      throw CompanyNotFoundException();
+    }
+
+    await getCurrentSurveyDocName(docCompanyUIDSnapshot);
+
+    resultsDocRef = _firestore.collection('surveyData/$companyUID/$latestSurveyDocName/results/data').doc(surveyToken); //Get the results document where results should be saved in
+    final docSurveyResultSnapshot = await resultsDocRef?.get();
+    if (docSurveyResultSnapshot == null || !docSurveyResultSnapshot.exists) {
+      throw InvalidSurveyTokenException();
+    }
+
+    //Lastly if all good up to here. Then tokens are correct. Now check if alraedy started.
+
+    if (docSurveyResultSnapshot.data()?['finished'] == true) {
+      throw SurveyAlreadyCompletedException();
+    }
+  }
+
+  Future<void> getCurrentSurveyDocName(var docCompanyUIDSnapshot) async {
+    //Get the current assessment. It will be the latest doc.
+    try {
+      latestSurveyDocName = docCompanyUIDSnapshot.data()?['latestSurvey']; //Get latest survey
+      if (latestSurveyDocName == null) {
+        throw NoActiveSurveyException();
+      }
+    } on Exception catch (e) {
+      if (e is SurveyException) {
+        rethrow;
+      }
+      log.severe('Error setting up Survey $e');
+      throw SurveyException('An unexpected error occurred while setting up the survey', 'Setup Error');
+    }
   }
 
   void addQuestiontoDB() {
