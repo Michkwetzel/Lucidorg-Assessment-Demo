@@ -18,7 +18,7 @@ class QuestionsProvider extends ChangeNotifier {
   // Private fields
   List<QuestionBase> _questions = [];
   String _textHeading = '';
-  int _currentIndex = 32; //Start at -1 because on first start click needs to load index = 0
+  int _currentIndex = -1; //Start at -1 because on first start click needs to load index = 0
   double _ratingInitialState = -1;
   int _radioInitialState = -1;
   Widget _currentQuestionCard = const Placeholder();
