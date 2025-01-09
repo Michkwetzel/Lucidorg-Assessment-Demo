@@ -96,6 +96,10 @@ class FirestoreService {
   }
 
   Future<void> checkTokens() async {
+    if (surveyToken == 'test'){
+      print("not here");
+      return;
+    }
     if (surveyToken == null || companyUID == null) {
       //Check if token exists. if not. error
       throw MissingTokenException();

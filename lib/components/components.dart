@@ -479,6 +479,18 @@ class CustomNextButton extends StatelessWidget {
         questionsProvider.nextQuestion();
       } else {
         //Submit results
+        if (Provider.of<FirestoreService>(context, listen: false).surveyToken == 'test') {
+          try {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const FinalScreen(),
+              ),
+            );
+          } catch (e) {
+            print('Navigation error: $e');
+          }
+        }
         final results = questionsProvider.getResults();
         Provider.of<FirestoreService>(context, listen: false).saveResults(results);
         try {

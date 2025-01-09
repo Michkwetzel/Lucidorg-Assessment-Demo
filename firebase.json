@@ -13,6 +13,7 @@
   },
   "hosting": {
     "public": "build/web",
+    "site": "assessment-909ce",
     "ignore": [
       "firebase.json",
       "**/.*",
