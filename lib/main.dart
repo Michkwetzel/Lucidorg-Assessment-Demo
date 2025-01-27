@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:front_survey_questions/changeNotifiers/surveyDataProvider.dart';
 import 'package:front_survey_questions/changeNotifiers/questionsProvider.dart';
 import 'package:front_survey_questions/changeNotifiers/radioButtonsState.dart';
 import 'package:front_survey_questions/changeNotifiers/ratingBarState.dart';
@@ -7,6 +8,7 @@ import 'package:front_survey_questions/screens/errorScreen.dart';
 import 'package:front_survey_questions/screens/finalScreen.dart';
 import 'package:front_survey_questions/screens/welcomeScreen.dart';
 import 'package:front_survey_questions/services/firestoreService.dart';
+import 'package:front_survey_questions/services/googleFunctionService.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
@@ -39,6 +41,9 @@ Future<void> main() async {
     surveyToken = uri.queryParameters['token1'];
     companyUID = uri.queryParameters['token2'];
 
+    surveyToken = 'MQ5StGF7ML4Yl8igF6b8';
+    companyUID = 'FJkapdf1YsH0iV0AB6a4';
+
     if (surveyToken == null || companyUID == null) {
       throw MissingTokenException();
     }
@@ -53,13 +58,17 @@ Future<void> main() async {
             ratingBarState: context.read<Ratingbarstate>(),
           ),
         ),
+        ChangeNotifierProvider(create: (context) => LatestDocnameProvider()),
         Provider<FirestoreService>(
           create: (context) {
             final questionsProvider = Provider.of<QuestionsProvider>(context, listen: false);
             return FirestoreService(questions: questionsProvider, surveyToken: surveyToken, companyUID: companyUID);
           },
           lazy: false,
-        )
+        ),
+        Provider<GoogleFunctionService>(create: (context) {
+          return GoogleFunctionService(surveyToken: surveyToken, companyUID: companyUID);
+        })
       ],
       child: MyApp(),
     ));
