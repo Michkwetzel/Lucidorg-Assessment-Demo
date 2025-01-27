@@ -60,7 +60,6 @@ class QuestionsProvider extends ChangeNotifier {
 
   void sortQuestions() {
     _questions.sort((a, b) => a.index.compareTo(b.index));
-    log.info('QuestionProvider sorted');
   }
 
   QuestionBase? getQuestion(int index) {

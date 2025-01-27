@@ -65,7 +65,6 @@ class FirestoreService {
       });
       log.info("$count Multiple choice Questions loaded into QuestionsProvider.");
       questions.sortQuestions();
-      questions.printQuestions();
       log.info("getQuestions from FireStore successful");
     } catch (e, stackTrace) {
       questions.setQuestions([
@@ -91,14 +90,11 @@ class FirestoreService {
     resultsDocRef?.update({'results': resultsMap, 'finished': true});
   }
 
-  void surveyStarted() async {
-    resultsDocRef?.update({'started': true});
-  }
 
-  Future<void> checkTokens() async {
+  Future<String?> checkTokens() async {
     if (surveyToken == 'test'){
       print("not here");
-      return;
+      return null;
     }
     if (surveyToken == null || companyUID == null) {
       //Check if token exists. if not. error
@@ -123,6 +119,8 @@ class FirestoreService {
     if (docSurveyResultSnapshot.data()?['finished'] == true) {
       throw SurveyAlreadyCompletedException();
     }
+
+    return latestSurveyDocName;
   }
 
   Future<void> getCurrentSurveyDocName(var docCompanyUIDSnapshot) async {

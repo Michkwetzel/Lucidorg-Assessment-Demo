@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:front_survey_questions/changeNotifiers/surveyDataProvider.dart';
 import 'package:front_survey_questions/changeNotifiers/questionsProvider.dart';
 import 'package:front_survey_questions/components/components.dart';
 import 'package:front_survey_questions/constants.dart';
@@ -6,6 +7,7 @@ import 'package:front_survey_questions/exceptions.dart';
 import 'package:front_survey_questions/screens/errorScreen.dart';
 import 'package:front_survey_questions/screens/mainScreen.dart';
 import 'package:front_survey_questions/services/firestoreService.dart';
+import 'package:front_survey_questions/services/googleFunctionService.dart';
 import 'package:provider/provider.dart';
 
 class WelcomeScreen extends StatefulWidget {
@@ -29,21 +31,23 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
 
   // Combined initialization method
   Future<void> _initializeScreen() async {
+    if (mounted) {
+      setState(() {
+        _loadingText = "Loading Survey";
+      });
+    }
     try {
       final firestoreService = Provider.of<FirestoreService>(context, listen: false);
+      final latestDocnameProvider = Provider.of<LatestDocnameProvider>(context, listen: false);
 
-      // First check tokens
-      await firestoreService.checkTokens();
-
-      if (mounted) {
-        setState(() {
-          _loadingText = "Loading Survey";
-        });
-      }
+      // First Check tokens and get current Assssment DocName
+      final latestDocname = await firestoreService.checkTokens();
+      latestDocnameProvider.updateLatestDocname(latestDocname);
 
       // Then get questions
       await firestoreService.getQuestions();
 
+      // Done Loading
       if (mounted) {
         setState(() {
           _isLoading = false;
@@ -147,10 +151,11 @@ class WelcomeScreenComponentLayout extends StatelessWidget {
                       Text('Answers are saved anonymously. If you exit before finishing, your result will not be saved', style: kWelcomeScreenH2TextStyle),
                       SizedBox(height: 24),
                       CustomStartButton(
-                        onPressed: () {
+                        onPressed: () async {
                           log.info('Start Button pressed');
                           Provider.of<QuestionsProvider>(context, listen: false).nextQuestion();
-                          Provider.of<FirestoreService>(context, listen: false).surveyStarted();
+                          String? latestDocName = Provider.of<LatestDocnameProvider>(context, listen: false).latestDocname;
+                          await Provider.of<GoogleFunctionService>(context, listen: false).surveyStarted(latestDocName);
                           Navigator.push(context, MaterialPageRoute(builder: (context) => Mainscreen()));
                         },
                       )
