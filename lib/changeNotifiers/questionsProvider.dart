@@ -129,7 +129,7 @@ class QuestionsProvider extends ChangeNotifier {
   }
 
   void nextQuestion() {
-    log.info('Survey started and updated on doc');
+    log.info('Next question');
     if (_currentIndex < _questions.length) {
       _currentIndex++;
       setCurrentQuestionCard(_currentIndex);

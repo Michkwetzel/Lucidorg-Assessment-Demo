@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class LatestDocnameProvider extends ChangeNotifier {
+class SurveyDataProvider extends ChangeNotifier {
   String? latestDocname = '';
   String? surveyUID = '';
   String? comapnyUID = '';
