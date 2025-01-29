@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:front_survey_questions/changeNotifiers/questionsProvider.dart';
 import 'package:front_survey_questions/changeNotifiers/radioButtonsState.dart';
 import 'package:front_survey_questions/changeNotifiers/ratingBarState.dart';
+import 'package:front_survey_questions/changeNotifiers/surveyDataProvider.dart';
 import 'package:front_survey_questions/constants.dart';
 import 'package:front_survey_questions/enums.dart';
 import 'package:front_survey_questions/helperClasses/questionMultipleChoice.dart';
 import 'package:front_survey_questions/screens/finalScreen.dart';
 import 'package:front_survey_questions/services/firestoreService.dart';
+import 'package:front_survey_questions/services/googleFunctionService.dart';
 import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
 
@@ -446,10 +448,11 @@ class CustomNextButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    void nextQuestion() {
+    void nextQuestion() async {
       log.info('Next Button Clicked');
       double result;
       QuestionsProvider questionsProvider = Provider.of<QuestionsProvider>(context, listen: false);
+      SurveyDataProvider surveyDataProvider = Provider.of<SurveyDataProvider>(context, listen: false);
 
       // Go to first question
       if (questionsProvider.currentIndex == -1) {
@@ -492,7 +495,7 @@ class CustomNextButton extends StatelessWidget {
           }
         }
         final results = questionsProvider.getResults();
-        Provider.of<FirestoreService>(context, listen: false).saveResults(results);
+        await Provider.of<GoogleFunctionService>(context, listen: false).saveResults(surveyDataProvider.latestDocname, results);
         try {
           Navigator.pushReplacement(
             context,
@@ -504,7 +507,7 @@ class CustomNextButton extends StatelessWidget {
           print('Navigation error: $e');
         }
       }
-      Provider.of<QuestionsProvider>(context, listen: false).printQuestions();
+      //Provider.of<QuestionsProvider>(context, listen: false).printQuestions();
     }
 
     // double result = Provider.of<Ratingbarstate>(context, listen: false).saveRating();

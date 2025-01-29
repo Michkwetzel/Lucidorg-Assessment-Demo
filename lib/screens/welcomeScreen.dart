@@ -8,6 +8,7 @@ import 'package:front_survey_questions/screens/errorScreen.dart';
 import 'package:front_survey_questions/screens/mainScreen.dart';
 import 'package:front_survey_questions/services/firestoreService.dart';
 import 'package:front_survey_questions/services/googleFunctionService.dart';
+import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
 
 class WelcomeScreen extends StatefulWidget {
@@ -22,6 +23,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   bool _error = false;
   String _errorText = '';
   String _loadingText = "Validating Assessment";
+  Logger logger = Logger('WelcomeScreen');
 
   @override
   void initState() {
@@ -38,14 +40,20 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     }
     try {
       final firestoreService = Provider.of<FirestoreService>(context, listen: false);
-      final latestDocnameProvider = Provider.of<LatestDocnameProvider>(context, listen: false);
+      final latestDocnameProvider = Provider.of<SurveyDataProvider>(context, listen: false);
 
       // First Check tokens and get current Assssment DocName
       final latestDocname = await firestoreService.checkTokens();
       latestDocnameProvider.updateLatestDocname(latestDocname);
 
-      // Then get questions
-      await firestoreService.getQuestions();
+      // Get companyName
+      final companyName = await firestoreService.getCompanyName();
+      if (companyName == null) {
+        throw Exception('Company Name doesnt exist');
+      }
+
+      // Then get questions and replace with company Name
+      await firestoreService.getQuestions(companyName);
 
       // Done Loading
       if (mounted) {
@@ -56,6 +64,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     } on SurveyException catch (e) {
       _handleError(e.message);
     } catch (e) {
+      logger.severe('Unexpected Error: $e');
       _handleError("Unexpected Error");
     }
   }
@@ -154,7 +163,7 @@ class WelcomeScreenComponentLayout extends StatelessWidget {
                         onPressed: () async {
                           log.info('Start Button pressed');
                           Provider.of<QuestionsProvider>(context, listen: false).nextQuestion();
-                          String? latestDocName = Provider.of<LatestDocnameProvider>(context, listen: false).latestDocname;
+                          String? latestDocName = Provider.of<SurveyDataProvider>(context, listen: false).latestDocname;
                           await Provider.of<GoogleFunctionService>(context, listen: false).surveyStarted(latestDocName);
                           Navigator.push(context, MaterialPageRoute(builder: (context) => Mainscreen()));
                         },

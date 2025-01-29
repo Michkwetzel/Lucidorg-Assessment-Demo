@@ -21,7 +21,7 @@ class FirestoreService {
   ///Method that reads latest version question doc from firestore
   ///Creates Question object for each q in doc map
   ///Adds Questions to QuestionProvider
-  Future<void> getQuestions() async {
+  Future<void> getQuestions(String companyName) async {
     const String collection = 'surveyBuild';
     const String docID = 'v.2024-12-28';
 
@@ -40,8 +40,9 @@ class FirestoreService {
       Map<String, dynamic> ratingQuestions = docSnapshot.data()!['rating'];
       ratingQuestions.forEach((key, value) {
         count++;
+        String? newHeading = value['textHeading'].replaceAll('Test Company', companyName);
         questions.addQuestion(QuestionRating(
-          textHeading: value['textHeading'] ?? 'Default Text',
+          textHeading: newHeading ?? 'Default Text',
           textBody: value['textBody'] ?? 'Default Text',
           textExtra: value['textExtra'],
           index: value['index'],
@@ -55,8 +56,9 @@ class FirestoreService {
       Map<String, dynamic> multipleChoiceQuestions = docSnapshot.data()!['multipleChoice'];
       multipleChoiceQuestions.forEach((key, value) {
         count++;
+        String? newHeading = value['textHeading'].replaceAll('Test Company', companyName);
         questions.addQuestion(Questionmultiplechoice(
-          textHeading: value['textHeading'] ?? 'Default Text',
+          textHeading: newHeading ?? 'Default Text',
           textExtra: value['textExtra'],
           options: value['options'],
           index: value['index'],
@@ -79,7 +81,7 @@ class FirestoreService {
     }
   }
 
-  void saveResults(List<int> results) async {
+  Future<void> saveResults(List<int> results) async {
     // Turn result list into Map with qNUmbers
     Map<String, int> resultsMap = {};
     for (int i = 0; i < results.length; i++) {
@@ -90,9 +92,8 @@ class FirestoreService {
     resultsDocRef?.update({'results': resultsMap, 'finished': true});
   }
 
-
   Future<String?> checkTokens() async {
-    if (surveyToken == 'test'){
+    if (surveyToken == 'test') {
       print("not here");
       return null;
     }
@@ -139,141 +140,149 @@ class FirestoreService {
     }
   }
 
+  Future<String?> getCompanyName() async {
+    final docsnapshot = await _firestore.collection('surveyData').doc(companyUID).get();
+    final Map<String, dynamic> companyInfo = docsnapshot.data()!['companyInfo'];
+    final companyName = companyInfo['companyName'];
+    print(companyName);
+    return companyName;
+  }
+
   void addQuestiontoDB() {
     //Used to add questions to DB
 
     Map<String, Map<String, dynamic>> ratingQuestions = {
       'q0': {
         'index': 0,
-        'textHeading': 'Everyone in Test Company...',
+        'textHeading': 'Everyone in []...',
         'textBody': 'knows and understands the company\'s purpose, mission, vision and values.',
         'textExtra': 'Purpose defines why a company exists, while mission defines what the company does, vision defines where it wants to go and values define how it operates.',
       },
       'q1': {
         'index': 1,
-        'textHeading': 'Everyone in Test Company...',
+        'textHeading': 'Everyone in []...',
         'textBody': 'knows the growth path over the next 2 years including budgets, goals and milestones.',
         'textExtra':
             'Growth path defines where the company should be in the next 2 years as well as milestones, budgets and focus areas. This allows employees to understand why the company is making decisions to achieve long term growth.'
       },
       'q2': {
         'index': 2,
-        'textHeading': 'Everyone in Test Company...',
+        'textHeading': 'Everyone in []...',
         'textBody': 'knows the department structure, whom to go to for questions and whom to work with cross-functionally to solve problems.',
         'textExtra': 'Cross-functional work defines how different departments work together to achieve company goals.'
       },
       'q3': {
         'index': 3,
-        'textHeading': 'Everyone in Test Company...',
+        'textHeading': 'Everyone in []...',
         'textBody': 'tracks collaborative KPIs, surfaces them, drives action from them and everyone understands which departments are involved with each KPI.',
         'textExtra':
             'Collaborative KPI\'s clearly define how every department affects a KPI. When employees understand how their work impacts a specific metric, each role feels more ownership in the success of a company.',
       },
       'q4': {
         'index': 4,
-        'textHeading': 'Everyone in Test Company...',
+        'textHeading': 'Everyone in []...',
         'textBody': 'has cross-functional team leaders assigned to ensuring departments and people are all working towards the same goals.',
       },
       'q5': {
         'index': 5,
-        'textHeading': 'Test Company...',
+        'textHeading': '[]...',
         'textBody': 'fosters a culture of open communication and collaboration, contributing to employee engagement and productivity.',
       },
       'q6': {
         'index': 6,
-        'textHeading': 'Test Company...',
+        'textHeading': '[]]...',
         'textBody': 'provides learning and development opportunities for employees to advance and develop their skills within the organization.',
       },
       'q7': {
         'index': 7,
-        'textHeading': 'Test Company...',
+        'textHeading': '[]...',
         'textBody': 'provides an outline of all departmental roles and responsibilities across the company and trains all new hires, team leads, and leaders on roles & responsibilities.',
       },
       'q8': {
         'index': 8,
-        'textHeading': 'Test Company...',
+        'textHeading': '[]...',
         'textBody': 'has communication channels in place for employees to share ideas and concerns.',
       },
       'q9': {
         'index': 9,
-        'textHeading': 'Test Company...',
+        'textHeading': '[]...',
         'textBody': 'sets aside budget, time, and leadership to drive engagement across the entire company.',
       },
       'q10': {
         'index': 10,
-        'textHeading': 'Test Company and it\'s leadership team...',
+        'textHeading': '[] and it\'s leadership team...',
         'textBody': 'Efficiently distributes information to create a culture of cross-collaborative decision-making.',
         'textExtra': 'Cross-collaborative decision-making defines how different people from different departments work together to achieve the companies goals.',
       },
       'q11': {
         'index': 11,
-        'textHeading': 'Test Company and it\'s leadership team...',
+        'textHeading': '[] and it\'s leadership team...',
         'textBody': 'Includes cross-functional teams to drive the decision and implementation of technology systems and usage across the company.',
       },
       'q12': {
         'index': 12,
-        'textHeading': 'Test Company and it\'s leadership team...',
+        'textHeading': '[] and it\'s leadership team...',
         'textBody': 'Provides understanbily  defined processes and technology to support employee productivity and engagement.',
       },
       'q13': {
         'index': 13,
-        'textHeading': 'Test Company and it\'s leadership team...',
+        'textHeading': '[] and it\'s leadership team...',
         'textBody': 'Has a forward-looking tech strategy in place to support current operations and support scale without creating tech-debt.',
       },
       'q14': {
         'index': 14,
-        'textHeading': 'Test Company and it\'s leadership team...',
+        'textHeading': '[] and it\'s leadership team...',
         'textBody': 'Runs and organizes meetings efficiently with clear agendas, goals and outcomes.',
       },
       'q15': {
         'index': 15,
-        'textHeading': 'Test Company...',
+        'textHeading': '[]...',
         'textBody': 'Has the right leaders, in the right roles that drive a culture of  leadership development with all staff.',
         'textExtra': 'Leadership is a function of motivating people to learn and develop into leaders themselves, while at the same time supporting employee success and learning.'
       },
       'q16': {
         'index': 16,
-        'textHeading': 'Test Company...',
+        'textHeading': '[]...',
         'textBody': 'Drives a culture of reverse accountability (staff holding leaders accountable) and provides a system for anonymous structured feedback.',
       },
       'q17': {
         'index': 17,
-        'textHeading': 'Test Company...',
+        'textHeading': '[]...',
         'textBody': 'Has continuous cross-functional leadership training for all executives, department leads and anyone leading people in the organization.',
       },
       'q18': {
         'index': 18,
-        'textHeading': 'Test Company...',
+        'textHeading': '[]...',
         'textBody': 'Has moved away from a hierarchical management structure to an autonomous leadership and department structure where management time is reduced and decisions are driven by data.',
       },
       'q19': {
         'index': 19,
-        'textHeading': 'Test Company...',
+        'textHeading': '[]...',
         'textBody': 'Has a culture of accountable, autonomous leadership with an understanding of the difference of management and leadership.',
       },
       'q20': {
         'index': 20,
-        'textHeading': 'Test Company...',
+        'textHeading': '[]...',
         'textBody': 'Is committed to creating a healthy, motivational, and learning-oriented workplace.',
       },
       'q21': {
         'index': 21,
-        'textHeading': 'Test Company...',
+        'textHeading': '[]...',
         'textBody': 'Is committed to customer satisfaction and understands that employee satisfaction directly affects customer success.',
       },
       'q22': {
         'index': 22,
-        'textHeading': 'Test Company...',
+        'textHeading': '[]...',
         'textBody': 'Is innovative and prepared to be able to adapt to market changes quickly.',
       },
       'q23': {
         'index': 23,
-        'textHeading': 'Test Company...',
+        'textHeading': '[]...',
         'textBody': 'Is readily prepared to scale efficiently with little organizational friction.',
       },
       'q24': {
         'index': 24,
-        'textHeading': 'Test Company...',
+        'textHeading': '[]...',
         'textBody': 'has systems in place to support and reward employees who uphold company values and take action against employees who don\'t support the values.',
       },
     };
@@ -281,7 +290,7 @@ class FirestoreService {
     Map<String, Map<String, dynamic>> multipleChoiceQuestions = {
       'q25': {
         'index': 25,
-        'textHeading': 'What is the state of purpose at Test Company?',
+        'textHeading': 'What is the state of purpose at []?',
         'options': [
           'The company has a mission and vision but lacks a clear purpose.',
           'The company has a defined purpose, but it\'s not well-communicated or understood by many.',
@@ -294,7 +303,7 @@ class FirestoreService {
       },
       'q26': {
         'index': 26,
-        'textHeading': 'What is the current state of Test Company\'s growth strategy?',
+        'textHeading': 'What is the current state of []\'s growth strategy?',
         'options': [
           'The company lacks a clear growth strategy, leading to disjointed and inconsistent efforts.',
           'A foundational growth strategy is in place but remains vague to many.',
@@ -307,7 +316,7 @@ class FirestoreService {
       },
       'q27': {
         'index': 27,
-        'textHeading': 'How aligned is Test Company\'s org structure?',
+        'textHeading': 'How aligned is []\'s org structure?',
         'options': [
           'The organizational structure is unclear to most, causing role confusion',
           'Basic organizational structure exists and is communicated, but many are unsure who to approach',
@@ -319,7 +328,7 @@ class FirestoreService {
       },
       'q28': {
         'index': 28,
-        'textHeading': 'How collaborative & aligned are Test Company\'s processes?',
+        'textHeading': 'How collaborative & aligned are []\'s processes?',
         'options': [
           'The company has few defined collaborative processes.',
           'Basic collaborating processes are in place but are misaligned.',
@@ -331,7 +340,7 @@ class FirestoreService {
       },
       'q29': {
         'index': 29,
-        'textHeading': 'Does Test Company track collaborative KPI\'s?',
+        'textHeading': 'Does [] track collaborative KPI\'s?',
         'options': [
           'The company lacks collaborative KPIs, leading to unstructured decisions.',
           'Preliminary KPIs have been introduced, but their adoption is not standardized.',
@@ -345,7 +354,7 @@ class FirestoreService {
       },
       'q30': {
         'index': 30,
-        'textHeading': 'Describe the alignment of Test Company\'s tech stack.',
+        'textHeading': 'Describe the alignment of []\'s tech stack.',
         'options': [
           'The company lacks a clear long/mid-term aligned technology strategy, leading to many fragmented efforts.',
           'There\'s a technology strategy in place, but it\'s isolated and not universally understood or integrated.',
@@ -357,7 +366,7 @@ class FirestoreService {
       },
       'q31': {
         'index': 31,
-        'textHeading': 'Does Test company have cross-functional communication.',
+        'textHeading': 'Does [] have cross-functional communication.',
         'options': [
           'The company has minimal cross-functional collaborative communication.',
           'Initial attempts at cross-functional communication exist but lack consistency.',
@@ -370,7 +379,7 @@ class FirestoreService {
       },
       'q32': {
         'index': 32,
-        'textHeading': 'Describe the state of autonomy & purpouse led leadership at Test Company.',
+        'textHeading': 'Describe the state of autonomy & purpouse led leadership at [].',
         'options': [
           'Leadership decision-making is centralized with almost no autonomy.',
           'Limited autonomy is present, but the majority of decisions are by top leaders.',
@@ -382,7 +391,7 @@ class FirestoreService {
       },
       'q33': {
         'index': 33,
-        'textHeading': 'Describe the community at Test Company.',
+        'textHeading': 'Describe the community at [].',
         'options': [
           'The organization lacks a sense of community, resulting in detachment among members.',
           'There are some efforts towards community-building, but they are sporadic and lack widespread adoption.',
@@ -395,7 +404,7 @@ class FirestoreService {
       },
       'q34': {
         'index': 34,
-        'textHeading': 'Describe how meetings take place at Test Company.',
+        'textHeading': 'Describe how meetings take place at [].',
         'options': [
           'The company is swamped with meetings and unprepared participants.',
           'There\'s an initiative to refine meetings, but clarity on agendas and results is still lacking.',
@@ -407,7 +416,7 @@ class FirestoreService {
       },
       'q35': {
         'index': 35,
-        'textHeading': 'Describe the state of cross-functional accountability at Test Company.',
+        'textHeading': 'Describe the state of cross-functional accountability at [].',
         'options': [
           'Neither staff nor leaders have a mechanism to hold each other accountable and delivery dates are often missed.',
           'There is accountability in some teams and from certain leaders, but little cross-collaborative accountability.',

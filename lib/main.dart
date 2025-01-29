@@ -21,7 +21,7 @@ Future<void> main() async {
     void initializeLogging() {
       Logger.root.level = Level.ALL;
       Logger.root.onRecord.listen((record) {
-        print('${record.level.name}: ${record.time}: ${record.message}');
+        print('${record.level.name}: ${record.loggerName}: ${record.time}: ${record.message}');
       });
     }
 
@@ -58,7 +58,7 @@ Future<void> main() async {
             ratingBarState: context.read<Ratingbarstate>(),
           ),
         ),
-        ChangeNotifierProvider(create: (context) => LatestDocnameProvider()),
+        ChangeNotifierProvider(create: (context) => SurveyDataProvider()),
         Provider<FirestoreService>(
           create: (context) {
             final questionsProvider = Provider.of<QuestionsProvider>(context, listen: false);
@@ -98,7 +98,6 @@ class MyApp extends StatelessWidget {
         fontFamily: 'Nunito',
       ),
       home: WelcomeScreen(),
-      routes: {'/finalscreen': (context) => const FinalScreen()},
     );
   }
 }

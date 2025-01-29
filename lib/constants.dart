@@ -96,3 +96,6 @@ const kRatingBarHintTextStyle = TextStyle(
   fontWeight: FontWeight.w400,
   decoration: TextDecoration.none,
 );
+
+const String kSurveyStartedPath = 'https://surveystarted-rbyavkqn2a-uc.a.run.app';
+// const String kVerifyAuthTokenPath = 'http://127.0.0.1:5001/efficiency-1st/us-central1/verifyAuthToken';
