@@ -21,7 +21,7 @@ class GoogleFunctionService {
   Future<void> saveResults(String? latestDocname, List<int> results) async {
     //Send companyUID, LastestSurveyDocName and surveyToken to back end so that it can change data
     Map<String, dynamic> request = {'latestSurveyDocName': latestDocname!, 'companyUID': companyUID!, 'surveyUID': surveyToken!, 'results': results};
-    String path = 'http://127.0.0.1:5001/efficiency-1st/us-central1/saveResults';
+    String path = ksaveResultsPath;
 
     await HttpService.postRequest(path: path, request: request);
     logger.info('Saved results to back end for company: $companyUID, surveyToken: $surveyToken');
