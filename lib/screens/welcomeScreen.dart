@@ -44,6 +44,17 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
 
       // First Check tokens and get current Assssment DocName
       final latestDocname = await firestoreService.checkTokens();
+      if (latestDocname == "test") {
+        latestDocnameProvider.updateLatestDocname('test');
+        await firestoreService.getQuestions('Test Company');
+        // Done Loading
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+        }
+        return;
+      }
       latestDocnameProvider.updateLatestDocname(latestDocname);
 
       // Get companyName
