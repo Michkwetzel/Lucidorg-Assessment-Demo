@@ -493,9 +493,10 @@ class CustomNextButton extends StatelessWidget {
           } catch (e) {
             print('Navigation error: $e');
           }
+        } else {
+          final results = questionsProvider.getResults();
+          await Provider.of<GoogleFunctionService>(context, listen: false).saveResults(surveyDataProvider.latestDocname, results);
         }
-        final results = questionsProvider.getResults();
-        await Provider.of<GoogleFunctionService>(context, listen: false).saveResults(surveyDataProvider.latestDocname, results);
         try {
           Navigator.pushReplacement(
             context,
