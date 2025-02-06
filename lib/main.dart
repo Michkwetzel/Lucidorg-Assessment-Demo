@@ -41,8 +41,9 @@ Future<void> main() async {
     surveyToken = uri.queryParameters['token1'];
     companyUID = uri.queryParameters['token2'];
 
-    surveyToken = '1u9fslM08q7O5DCleGct';
-    companyUID = 'testCompany';
+  
+    // surveyToken = 'SvVeSRwxpBMFFhrKYlLt';
+    // companyUID = 'testCompany';
 
     if (surveyToken == null || companyUID == null) {
       throw MissingTokenException();

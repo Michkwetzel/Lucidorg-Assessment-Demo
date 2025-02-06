@@ -92,10 +92,10 @@ class FirestoreService {
     resultsDocRef?.update({'results': resultsMap, 'finished': true});
   }
 
-  Future<String?> checkTokens() async {
+  Future<List<String?>> checkTokens() async {
     if (surveyToken == 'test') {
-      print("not here");
-      return "test";
+      log.info('Test Survey');
+      return ["test", "test"];
     }
     if (surveyToken == null || companyUID == null) {
       //Check if token exists. if not. error
@@ -109,7 +109,7 @@ class FirestoreService {
 
     await getCurrentSurveyDocName(docCompanyUIDSnapshot);
 
-    resultsDocRef = _firestore.collection('surveyData/$companyUID/$latestSurveyDocName/results/data').doc(surveyToken); //Get the results document where results should be saved in
+    resultsDocRef = _firestore.collection('surveyData/$companyUID/$latestSurveyDocName').doc(surveyToken); //Get the results document where results should be saved in
     final docSurveyResultSnapshot = await resultsDocRef?.get();
     if (docSurveyResultSnapshot == null || !docSurveyResultSnapshot.exists) {
       throw InvalidSurveyTokenException();
@@ -121,7 +121,9 @@ class FirestoreService {
       throw SurveyAlreadyCompletedException();
     }
 
-    return latestSurveyDocName;
+    String emailType = docSurveyResultSnapshot.data()?['emailType'];
+
+    return [emailType, latestSurveyDocName];
   }
 
   Future<void> getCurrentSurveyDocName(var docCompanyUIDSnapshot) async {
