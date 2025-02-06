@@ -40,12 +40,14 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     }
     try {
       final firestoreService = Provider.of<FirestoreService>(context, listen: false);
-      final latestDocnameProvider = Provider.of<SurveyDataProvider>(context, listen: false);
+      final surveyDataProvider = Provider.of<SurveyDataProvider>(context, listen: false);
 
       // First Check tokens and get current Assssment DocName
-      final latestDocname = await firestoreService.checkTokens();
+      final infoList = await firestoreService.checkTokens();
+      final String? emailType = infoList[0];
+      final String? latestDocname = infoList[1];
       if (latestDocname == "test") {
-        latestDocnameProvider.updateLatestDocname('test');
+        surveyDataProvider.updateLatestDocname('test');
         await firestoreService.getQuestions('Test Company');
         // Done Loading
         if (mounted) {
@@ -55,7 +57,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         }
         return;
       }
-      latestDocnameProvider.updateLatestDocname(latestDocname);
+      surveyDataProvider.updateLatestDocname(latestDocname);
+      surveyDataProvider.updateEmailType(emailType);
 
       // Get companyName
       final companyName = await firestoreService.getCompanyName();

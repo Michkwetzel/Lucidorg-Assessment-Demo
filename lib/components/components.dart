@@ -495,7 +495,7 @@ class CustomNextButton extends StatelessWidget {
           }
         } else {
           final results = questionsProvider.getResults();
-          await Provider.of<GoogleFunctionService>(context, listen: false).saveResults(surveyDataProvider.latestDocname, results);
+          await Provider.of<GoogleFunctionService>(context, listen: false).saveResults(surveyDataProvider.latestDocname, surveyDataProvider.emailType, results);
         }
         try {
           Navigator.pushReplacement(

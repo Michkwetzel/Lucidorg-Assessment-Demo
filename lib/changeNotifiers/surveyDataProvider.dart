@@ -4,6 +4,7 @@ class SurveyDataProvider extends ChangeNotifier {
   String? latestDocname = '';
   String? surveyUID = '';
   String? comapnyUID = '';
+  String? emailType = '';
 
   String? getLatestDocname() {
     return latestDocname;
@@ -15,6 +16,10 @@ class SurveyDataProvider extends ChangeNotifier {
 
   String? getCompanyUID() {
     return comapnyUID;
+  }
+
+  String? getEmailType() {
+    return emailType;
   }
 
   List<String> getAllInfo() {
@@ -33,6 +38,11 @@ class SurveyDataProvider extends ChangeNotifier {
 
   void updateCompanyUID(String? newCompanyUID) {
     comapnyUID = newCompanyUID;
+    notifyListeners();
+  }
+
+  void updateEmailType(String? newEmailType) {
+    emailType = newEmailType;
     notifyListeners();
   }
 }
