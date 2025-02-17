@@ -92,7 +92,7 @@ class FirestoreService {
     resultsDocRef?.update({'results': resultsMap, 'finished': true});
   }
 
-  Future<List<String?>> checkTokens() async {
+  Future<List<dynamic>> checkTokens() async {
     if (surveyToken == 'test') {
       log.info('Test Survey');
       return ["test", "test"];
@@ -107,23 +107,24 @@ class FirestoreService {
       throw CompanyNotFoundException();
     }
 
+    // Read latest doc name from company Doc
     await getCurrentSurveyDocName(docCompanyUIDSnapshot);
 
     resultsDocRef = _firestore.collection('surveyData/$companyUID/$latestSurveyDocName').doc(surveyToken); //Get the results document where results should be saved in
-    final docSurveyResultSnapshot = await resultsDocRef?.get();
-    if (docSurveyResultSnapshot == null || !docSurveyResultSnapshot.exists) {
+    final docSnapshot = await resultsDocRef?.get();
+    if (docSnapshot == null || !docSnapshot.exists) {
       throw InvalidSurveyTokenException();
     }
 
-    //Lastly if all good up to here. Then tokens are correct. Now check if alraedy started.
-
-    if (docSurveyResultSnapshot.data()?['finished'] == true) {
+    //Lastly if all good up to here. Then tokens are correct. Now check if alraedy finished.
+    if (docSnapshot.data()?['finished'] == true) {
       throw SurveyAlreadyCompletedException();
     }
 
-    String emailType = docSurveyResultSnapshot.data()?['emailType'];
+    bool started = docSnapshot.data()?['started'];
+    String emailType = docSnapshot.data()?['emailType'];
 
-    return [emailType, latestSurveyDocName];
+    return [emailType, latestSurveyDocName, started];
   }
 
   Future<void> getCurrentSurveyDocName(var docCompanyUIDSnapshot) async {
