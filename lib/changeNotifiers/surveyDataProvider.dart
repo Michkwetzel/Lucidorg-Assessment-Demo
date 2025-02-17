@@ -45,4 +45,5 @@ class SurveyDataProvider extends ChangeNotifier {
     emailType = newEmailType;
     notifyListeners();
   }
+
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:front_survey_questions/changeNotifiers/startedProvider.dart';
 import 'package:front_survey_questions/changeNotifiers/surveyDataProvider.dart';
 import 'package:front_survey_questions/changeNotifiers/questionsProvider.dart';
 import 'package:front_survey_questions/changeNotifiers/radioButtonsState.dart';
@@ -41,9 +42,8 @@ Future<void> main() async {
     surveyToken = uri.queryParameters['token1'];
     companyUID = uri.queryParameters['token2'];
 
-  
-    // surveyToken = 'Br8Vg6gjWhm5v4sKaBmt';
-    // companyUID = 'FJkapdf1YsH0iV0AB6a4';
+    // companyUID = '43YmAxElOqHXQFvktOvN';
+    // surveyToken = '2S7TM0gw0vJ6IBZfXNbd';
 
     if (surveyToken == null || companyUID == null) {
       throw MissingTokenException();
@@ -51,6 +51,7 @@ Future<void> main() async {
 
     runApp(MultiProvider(
       providers: [
+        ChangeNotifierProvider(create: (context) => StartedProvider()),
         ChangeNotifierProvider(create: (context) => RadioButtonState()),
         ChangeNotifierProvider(create: (context) => Ratingbarstate()),
         ChangeNotifierProvider(

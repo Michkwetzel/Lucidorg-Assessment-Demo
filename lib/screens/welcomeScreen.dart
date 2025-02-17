@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:front_survey_questions/changeNotifiers/startedProvider.dart';
 import 'package:front_survey_questions/changeNotifiers/surveyDataProvider.dart';
 import 'package:front_survey_questions/changeNotifiers/questionsProvider.dart';
 import 'package:front_survey_questions/components/components.dart';
@@ -46,6 +47,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       final infoList = await firestoreService.checkTokens();
       final String? emailType = infoList[0];
       final String? latestDocname = infoList[1];
+
       if (latestDocname == "test") {
         surveyDataProvider.updateLatestDocname('test');
         await firestoreService.getQuestions('Test Company');
@@ -57,6 +59,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         }
         return;
       }
+
       surveyDataProvider.updateLatestDocname(latestDocname);
       surveyDataProvider.updateEmailType(emailType);
 
@@ -178,10 +181,13 @@ class WelcomeScreenComponentLayout extends StatelessWidget {
                           log.info('Start Button pressed');
                           Provider.of<QuestionsProvider>(context, listen: false).nextQuestion();
                           String? latestDocName = Provider.of<SurveyDataProvider>(context, listen: false).latestDocname;
-                          await Provider.of<GoogleFunctionService>(context, listen: false).surveyStarted(latestDocName);
+                          if (Provider.of<StartedProvider>(context, listen: false).canSendStartRequest == true) {
+                            Provider.of<StartedProvider>(context, listen: false).disableStartingAgain();
+                            await Provider.of<GoogleFunctionService>(context, listen: false).surveyStarted(latestDocName);
+                          }
                           Navigator.push(context, MaterialPageRoute(builder: (context) => Mainscreen()));
                         },
-                      )
+                      ),
                     ],
                   ),
                 ),
