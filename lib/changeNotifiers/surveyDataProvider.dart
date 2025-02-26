@@ -6,6 +6,8 @@ class SurveyDataProvider extends ChangeNotifier {
   String? comapnyUID = '';
   String? emailType = '';
 
+  SurveyDataProvider({this.surveyUID, this.comapnyUID});
+
   String? getLatestDocname() {
     return latestDocname;
   }
@@ -45,5 +47,4 @@ class SurveyDataProvider extends ChangeNotifier {
     emailType = newEmailType;
     notifyListeners();
   }
-
 }

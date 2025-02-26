@@ -122,8 +122,8 @@ class LoadingScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Image.asset(
-              'assets/logo/efficiency-1stLogo.png',
-              width: 150,
+              'assets/logo/logo.jpg',
+              width: 180,
             ),
             const SizedBox(height: 24),
             const CircularProgressIndicator(
@@ -157,8 +157,8 @@ class WelcomeScreenComponentLayout extends StatelessWidget {
             children: [
               SizedBox(height: 1),
               Image.asset(
-                'assets/logo/efficiency-1stLogo.png',
-                width: 150,
+                'assets/logo/logo.jpg',
+                width: 300,
               ),
               Container(
                 constraints: BoxConstraints(maxWidth: 350),
@@ -181,13 +181,25 @@ class WelcomeScreenComponentLayout extends StatelessWidget {
                           log.info('Start Button pressed');
                           Provider.of<QuestionsProvider>(context, listen: false).nextQuestion();
                           String? latestDocName = Provider.of<SurveyDataProvider>(context, listen: false).latestDocname;
+                          String? surveyUID = Provider.of<SurveyDataProvider>(context, listen: false).surveyUID;
+                          String? CompanyUID = Provider.of<SurveyDataProvider>(context, listen: false).comapnyUID;
+
+                          await Provider.of<StartedProvider>(context, listen: false).checkStartedinDB(latestDocName!, surveyUID!, CompanyUID!);
                           if (Provider.of<StartedProvider>(context, listen: false).canSendStartRequest == true) {
+                            print("sending google request to start");
                             Provider.of<StartedProvider>(context, listen: false).disableStartingAgain();
                             await Provider.of<GoogleFunctionService>(context, listen: false).surveyStarted(latestDocName);
                           }
                           Navigator.push(context, MaterialPageRoute(builder: (context) => Mainscreen()));
                         },
                       ),
+                      // For updating data
+                      // CustomStartButton(
+                      //   onPressed: () async {
+                      //     log.info('Start Button pressed');
+                      //     await Provider.of<GoogleFunctionService>(context, listen: false).pushTestResults('sd');
+                      //   },
+                      // ),
                     ],
                   ),
                 ),

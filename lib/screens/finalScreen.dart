@@ -14,11 +14,11 @@ class FinalScreen extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              SizedBox( 
+              SizedBox(
                 height: 1,
               ),
               Image.asset(
-                'assets/logo/efficiency-1stLogo.png',
+                'assets/logo/logo.jpg',
                 width: 150,
               ),
               Container(
@@ -30,7 +30,7 @@ class FinalScreen extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Thank you for completing the Assessment', style: kWelcomeScreenH1TextStyle),
+                      Text('Thank you for completing the assessment', style: kWelcomeScreenH1TextStyle),
                       SizedBox(height: 8),
                       Text('Have a great day', style: kWelcomeScreenH2TextStyle),
                     ],
