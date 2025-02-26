@@ -42,8 +42,8 @@ Future<void> main() async {
     surveyToken = uri.queryParameters['token1'];
     companyUID = uri.queryParameters['token2'];
 
-    // companyUID = '43YmAxElOqHXQFvktOvN';
-    // surveyToken = '2S7TM0gw0vJ6IBZfXNbd';
+    // surveyToken = 'e5mewsaiJANHdbtsnma3';
+    // companyUID = 'RhBs9nhOWigeGY8wVUEU';
 
     if (surveyToken == null || companyUID == null) {
       throw MissingTokenException();
@@ -51,7 +51,6 @@ Future<void> main() async {
 
     runApp(MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (context) => StartedProvider()),
         ChangeNotifierProvider(create: (context) => RadioButtonState()),
         ChangeNotifierProvider(create: (context) => Ratingbarstate()),
         ChangeNotifierProvider(
@@ -60,7 +59,8 @@ Future<void> main() async {
             ratingBarState: context.read<Ratingbarstate>(),
           ),
         ),
-        ChangeNotifierProvider(create: (context) => SurveyDataProvider()),
+        ChangeNotifierProvider(create: (context) => SurveyDataProvider(surveyUID: surveyToken, comapnyUID: companyUID)),
+        ChangeNotifierProvider(create: (context) => StartedProvider()),
         Provider<FirestoreService>(
           create: (context) {
             final questionsProvider = Provider.of<QuestionsProvider>(context, listen: false);
