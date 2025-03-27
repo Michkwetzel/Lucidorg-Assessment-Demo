@@ -8,7 +8,15 @@ class Questionmultiplechoice extends QuestionBase {
     super.textExtra,
     required super.type,
     required super.index,
-    required this.options,
+    this.options = const [
+      'Strongly disagree',
+      'Disagree',
+      'Slightly disagree',
+      'Neither agree not disagree',
+      'Slightly agree',
+      'Agree',
+      'Strongly agree',
+    ],
   });
 
   @override

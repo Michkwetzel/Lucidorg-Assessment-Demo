@@ -2,15 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:front_survey_questions/changeNotifiers/startedProvider.dart';
 import 'package:front_survey_questions/changeNotifiers/surveyDataProvider.dart';
 import 'package:front_survey_questions/changeNotifiers/questionsProvider.dart';
-import 'package:front_survey_questions/components/components.dart';
+import 'package:front_survey_questions/components/custonButtons/custom_start_button.dart';
 import 'package:front_survey_questions/constants.dart';
 import 'package:front_survey_questions/exceptions.dart';
 import 'package:front_survey_questions/screens/errorScreen.dart';
+import 'package:front_survey_questions/screens/loading_screen.dart';
 import 'package:front_survey_questions/screens/mainScreen.dart';
 import 'package:front_survey_questions/services/firestoreService.dart';
 import 'package:front_survey_questions/services/googleFunctionService.dart';
 import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
+
+Logger log = Logger('WelcomeScreen');
 
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key});
@@ -108,40 +111,6 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   }
 }
 
-class LoadingScreen extends StatelessWidget {
-  final String loadingText;
-
-  const LoadingScreen(this.loadingText, {super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Image.asset(
-              'assets/logo/logo.jpg',
-              width: 180,
-            ),
-            const SizedBox(height: 24),
-            const CircularProgressIndicator(
-              color: Colors.blue,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              loadingText,
-              style: Theme.of(context).textTheme.bodyLarge,
-              textAlign: TextAlign.center,
-            )
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class WelcomeScreenComponentLayout extends StatelessWidget {
   const WelcomeScreenComponentLayout({super.key});
 
@@ -183,21 +152,37 @@ class WelcomeScreenComponentLayout extends StatelessWidget {
                           String? latestDocName = Provider.of<SurveyDataProvider>(context, listen: false).latestDocname;
                           String? surveyUID = Provider.of<SurveyDataProvider>(context, listen: false).surveyUID;
                           String? CompanyUID = Provider.of<SurveyDataProvider>(context, listen: false).comapnyUID;
-
-                          await Provider.of<StartedProvider>(context, listen: false).checkStartedinDB(latestDocName!, surveyUID!, CompanyUID!);
+                          showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return Dialog(
+                                  backgroundColor: Colors.transparent,
+                                  child: Center(
+                                    child: const CircularProgressIndicator(
+                                      color: Colors.blue,
+                                    ),
+                                  ),
+                                );
+                              });
+                          // Check if you can start survey if yes change status in db
                           if (Provider.of<StartedProvider>(context, listen: false).canSendStartRequest == true) {
                             print("sending google request to start");
                             Provider.of<StartedProvider>(context, listen: false).disableStartingAgain();
                             await Provider.of<GoogleFunctionService>(context, listen: false).surveyStarted(latestDocName);
                           }
+                          await Provider.of<StartedProvider>(context, listen: false).checkStartedinDB(latestDocName!, surveyUID!, CompanyUID!).then(
+                            (value) {
+                              Navigator.pop(context);
+                            },
+                          );
                           Navigator.push(context, MaterialPageRoute(builder: (context) => Mainscreen()));
                         },
                       ),
                       // For updating data
                       // CustomStartButton(
                       //   onPressed: () async {
-                      //     log.info('Start Button pressed');
-                      //     await Provider.of<GoogleFunctionService>(context, listen: false).pushTestResults('sd');
+                      //     Provider.of<FirestoreService>(context, listen: false).addQuestiontoDB();
+                      //     Provider.of<GoogleFunctionService>(context,listen: false).pushTestResults();
                       //   },
                       // ),
                     ],
