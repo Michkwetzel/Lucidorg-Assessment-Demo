@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:front_survey_questions/changeNotifiers/questionsProvider.dart';
-import 'package:front_survey_questions/components/components.dart';
+import 'package:front_survey_questions/components/custonButtons/custom_back_button.dart';
+import 'package:front_survey_questions/components/custonButtons/custom_next_button.dart';
+import 'package:front_survey_questions/components/questionLayout/custom_progress_bar.dart';
+import 'package:front_survey_questions/components/questionLayout/top_component.dart';
 import 'package:provider/provider.dart';
 
 class Mainscreen extends StatelessWidget {
@@ -14,13 +17,6 @@ class Mainscreen extends StatelessWidget {
       backgroundColor: Colors.white,
       body: Center(
         child: Container(
-          // margin: EdgeInsets.all(24),
-          // padding: EdgeInsets.all(24),
-          // decoration: BoxDecoration(
-          //   color: Colors.white,
-          //   borderRadius: BorderRadius.circular(16),
-          //   boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.20), blurRadius: 2)],
-          // ),
           constraints: BoxConstraints(maxWidth: 550),
           child: Stack(
             children: [
@@ -56,7 +52,6 @@ class MainComponentLayout extends StatelessWidget {
         Consumer<QuestionsProvider>(
           builder: (context, questionsProvider, child) {
             return TopComponent(
-              text: questionsProvider.textHeading,
               hasExtraText: questionsProvider.hasExtraText,
               textExtra: questionsProvider.extraText,
               questionType: questionsProvider.currentQuestionType,
@@ -64,10 +59,12 @@ class MainComponentLayout extends StatelessWidget {
           },
         ),
         CustomProgressBar(),
-        Consumer<QuestionsProvider>(
-          builder: (context, questionsProvider, child) {
-            return questionsProvider.currentQuestionCard;
-          },
+        Flexible(
+          child: Consumer<QuestionsProvider>(
+            builder: (context, questionsProvider, child) {
+              return questionsProvider.currentQuestionCard;
+            },
+          ),
         )
       ],
     );

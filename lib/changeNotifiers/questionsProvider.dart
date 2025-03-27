@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:front_survey_questions/changeNotifiers/radioButtonsState.dart';
 import 'package:front_survey_questions/changeNotifiers/ratingBarState.dart';
+import 'package:front_survey_questions/components/questionLayout/multipleChoiceQuestion/multiple_choice_question_card.dart';
+import 'package:front_survey_questions/components/questionLayout/ratingQuestion/rating_question_card.dart';
 import 'package:front_survey_questions/enums.dart';
 import 'package:front_survey_questions/helperClasses/questionBase.dart';
 import 'package:front_survey_questions/helperClasses/questionMultipleChoice.dart';
 import 'package:front_survey_questions/helperClasses/questionRating.dart';
 import 'package:logging/logging.dart';
-import 'package:front_survey_questions/components/components.dart';
 
 class QuestionsProvider extends ChangeNotifier {
   final Logger log = Logger('QuestionsProvider');
@@ -90,6 +91,7 @@ class QuestionsProvider extends ChangeNotifier {
       if (currentQuestion is Questionmultiplechoice) {
         _textHeading = currentQuestion.textHeading;
         _currentQuestionCard = MultipleChoiceQuestionCard(
+          textHeading: currentQuestion.textHeading,
           options: currentQuestion.options,
         );
         if (currentQuestion.answered) {
