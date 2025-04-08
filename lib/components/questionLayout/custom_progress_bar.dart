@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:front_survey_questions/changeNotifiers/questionsProvider.dart';
+import 'package:front_survey_questions/constants.dart';
+import 'package:front_survey_questions/main.dart';
 import 'package:provider/provider.dart';
 
 class CustomProgressBar extends StatelessWidget {
@@ -9,11 +11,22 @@ class CustomProgressBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<QuestionsProvider>(
       builder: (context, questionsProvider, child) {
-        return LinearProgressIndicator(
-          value: questionsProvider.currentIndex / questionsProvider.questionLength,
-          backgroundColor: Color(0xffDADADA),
-          color: Color(0xff1FB707),
-        );
+        return Row(children: [
+          Expanded(
+            child: LinearProgressIndicator(
+              value: (questionsProvider.currentIndex + 1) / questionsProvider.questionLength,
+              backgroundColor: Color(0xffDADADA),
+              color: Color(0xff1FB707),
+            ),
+          ),
+          SizedBox(
+            width: 8,
+          ),
+          Text(
+            "${questionsProvider.currentIndex + 1} / ${questionsProvider.questionLength}",
+            style: kRatingBarHintTextStyle,
+          ),
+        ]);
       },
     );
   }

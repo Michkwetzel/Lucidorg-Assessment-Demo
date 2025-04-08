@@ -45,8 +45,8 @@ Future<void> main() async {
     // surveyToken = 'JD0wS50bddkNLHe2SZ4x';
     // companyUID = 'RhBs9nhOWigeGY8wVUEU';
 
-    // surveyToken = 'test';
-    // companyUID = 'test';
+    surveyToken = 'test';
+    companyUID = 'test';
 
     if (surveyToken == null || companyUID == null) {
       throw MissingTokenException();
