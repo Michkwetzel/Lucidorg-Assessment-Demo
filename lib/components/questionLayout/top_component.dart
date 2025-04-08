@@ -34,7 +34,6 @@ class TopComponent extends StatelessWidget {
               ),
             ),
             if (hasExtraText && questionType == QuestionType.multipleChoice) InfoButton(),
-            if (hasExtraText && questionType == QuestionType.multipleChoice) SizedBox(width: 8),
           ],
         ),
       ),

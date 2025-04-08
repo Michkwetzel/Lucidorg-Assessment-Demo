@@ -153,17 +153,20 @@ class WelcomeScreenComponentLayout extends StatelessWidget {
                           String? surveyUID = Provider.of<SurveyDataProvider>(context, listen: false).surveyUID;
                           String? CompanyUID = Provider.of<SurveyDataProvider>(context, listen: false).comapnyUID;
                           showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return Dialog(
-                                  backgroundColor: Colors.transparent,
-                                  child: Center(
-                                    child: const CircularProgressIndicator(
-                                      color: Colors.blue,
-                                    ),
+                            barrierDismissible: false,
+                            barrierColor: Colors.transparent,
+                            context: context,
+                            builder: (BuildContext context) {
+                              return Dialog(
+                                backgroundColor: Colors.transparent,
+                                child: Center(
+                                  child: const CircularProgressIndicator(
+                                    color: Colors.blue,
                                   ),
-                                );
-                              });
+                                ),
+                              );
+                            },
+                          );
                           // Check if you can start survey if yes change status in db
                           if (Provider.of<StartedProvider>(context, listen: false).canSendStartRequest == true) {
                             print("sending google request to start");

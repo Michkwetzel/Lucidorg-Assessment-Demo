@@ -36,7 +36,7 @@ const kH2TextStyle = TextStyle(
 
 const kH3TextStyle = TextStyle(
   fontFamily: 'Nunito',
-  fontSize: 24,
+  fontSize: 28,
   color: Color(0xFF2F2F2F),
   fontWeight: FontWeight.w400,
   decoration: TextDecoration.none,
@@ -75,7 +75,7 @@ const kBottomModalSheetTextStyle = TextStyle(
 
 const kRatingQTextStyle = TextStyle(
   fontFamily: 'Noto Sans',
-  fontSize: 20,
+  fontSize: 22,
   color: Color(0xFF343434),
   fontWeight: FontWeight.w400,
   decoration: TextDecoration.none,
@@ -102,5 +102,5 @@ const String kSurveyStartedPath = 'https://surveystarted-rbyavkqn2a-uc.a.run.app
 
 // const String kVerifyAuthTokenPath = 'http://127.0.0.1:5001/efficiency-1st/us-central1/verifyAuthToken';
 
-// const String ksaveResultsPath = 'https://saveresults-rbyavkqn2a-uc.a.run.app';
-const String ksaveResultsPath = 'http://127.0.0.1:5001/efficiency-1st/us-central1/saveResults';
+const String ksaveResultsPath = 'https://saveresults-rbyavkqn2a-uc.a.run.app';
+// const String ksaveResultsPath = 'http://127.0.0.1:5001/efficiency-1st/us-central1/saveResults';

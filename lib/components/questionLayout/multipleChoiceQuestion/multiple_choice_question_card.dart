@@ -44,7 +44,7 @@ class MultipleChoiceQuestionCard extends StatelessWidget {
       return Column(
         children: [
           SizedBox(
-            height: 28,
+            height: 24,
           ),
           Text(
             textHeading,
@@ -78,11 +78,14 @@ class MultipleChoiceQuestionCard extends StatelessWidget {
     return Column(
       children: [
         SizedBox(
-          height: 28,
+          height: 24,
         ),
-        Text(
-          textHeading,
-          style: kRatingQTextStyle,
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          child: Text(
+            textHeading,
+            style: kRatingQTextStyle,
+          ),
         ),
         Expanded(
           child: ListView.builder(

@@ -21,7 +21,7 @@ class RadioButtonCard extends StatelessWidget {
     return Padding(
       padding: padding,
       child: MaterialButton(
-        padding: EdgeInsets.all(16),
+        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 22),
         elevation: 0,
         onPressed: () => Provider.of<RadioButtonState>(context, listen: false).onRadioButtonSelected(radioButtonIndex),
         color: Colors.white,
