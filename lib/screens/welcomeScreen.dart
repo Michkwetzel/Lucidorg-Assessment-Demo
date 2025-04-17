@@ -4,6 +4,7 @@ import 'package:front_survey_questions/changeNotifiers/surveyDataProvider.dart';
 import 'package:front_survey_questions/changeNotifiers/questionsProvider.dart';
 import 'package:front_survey_questions/components/custonButtons/custom_start_button.dart';
 import 'package:front_survey_questions/constants.dart';
+import 'package:front_survey_questions/enums.dart';
 import 'package:front_survey_questions/exceptions.dart';
 import 'package:front_survey_questions/screens/errorScreen.dart';
 import 'package:front_survey_questions/screens/loading_screen.dart';
@@ -47,33 +48,10 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       final surveyDataProvider = Provider.of<SurveyDataProvider>(context, listen: false);
 
       // First Check tokens and get current Assssment DocName
-      final infoList = await firestoreService.checkTokens();
-      final String? emailType = infoList[0];
-      final String? latestDocname = infoList[1];
+      await surveyDataProvider.checkTokensandLoadData();
 
-      if (latestDocname == "test") {
-        surveyDataProvider.updateLatestDocname('test');
-        await firestoreService.getQuestions('Test Company');
-        // Done Loading
-        if (mounted) {
-          setState(() {
-            _isLoading = false;
-          });
-        }
-        return;
-      }
-
-      surveyDataProvider.updateLatestDocname(latestDocname);
-      surveyDataProvider.updateEmailType(emailType);
-
-      // Get companyName
-      final companyName = await firestoreService.getCompanyName();
-      if (companyName == null) {
-        throw Exception('Company Name doesnt exist');
-      }
-
-      // Then get questions and replace with company Name
-      await firestoreService.getQuestions(companyName);
+      // Get Questions
+      await firestoreService.getQuestions();
 
       // Done Loading
       if (mounted) {
@@ -148,44 +126,14 @@ class WelcomeScreenComponentLayout extends StatelessWidget {
                       CustomStartButton(
                         onPressed: () async {
                           log.info('Start Button pressed');
-                          Provider.of<QuestionsProvider>(context, listen: false).nextQuestion();
-                          String? latestDocName = Provider.of<SurveyDataProvider>(context, listen: false).latestDocname;
-                          String? surveyUID = Provider.of<SurveyDataProvider>(context, listen: false).surveyUID;
-                          String? CompanyUID = Provider.of<SurveyDataProvider>(context, listen: false).comapnyUID;
-                          showDialog(
-                            barrierDismissible: false,
-                            barrierColor: Colors.transparent,
-                            context: context,
-                            builder: (BuildContext context) {
-                              return Dialog(
-                                backgroundColor: Colors.transparent,
-                                child: Center(
-                                  child: const CircularProgressIndicator(
-                                    color: Colors.blue,
-                                  ),
-                                ),
-                              );
-                            },
-                          );
-                          // Check if you can start survey if yes change status in db
-                          if (Provider.of<StartedProvider>(context, listen: false).canSendStartRequest == true) {
-                            print("sending google request to start");
-                            Provider.of<StartedProvider>(context, listen: false).disableStartingAgain();
-                            await Provider.of<GoogleFunctionService>(context, listen: false).surveyStarted(latestDocName);
-                          }
-                          await Provider.of<StartedProvider>(context, listen: false).checkStartedinDB(latestDocName!, surveyUID!, CompanyUID!).then(
-                            (value) {
-                              Navigator.pop(context);
-                            },
-                          );
-                          Navigator.push(context, MaterialPageRoute(builder: (context) => Mainscreen()));
+                          await onSurveyStarted(context);
                         },
                       ),
                       // For updating data
                       // CustomStartButton(
                       //   onPressed: () async {
-                      //     Provider.of<FirestoreService>(context, listen: false).addQuestiontoDB();
-                      //     Provider.of<GoogleFunctionService>(context,listen: false).pushTestResults();
+                      //     // Provider.of<FirestoreService>(context, listen: false).addQuestiontoDB();
+                      //     Provider.of<GoogleFunctionService>(context, listen: false).addNewQuestionsCall();
                       //   },
                       // ),
                     ],
@@ -197,5 +145,112 @@ class WelcomeScreenComponentLayout extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Future<void> onSurveyStarted(BuildContext context) async {
+    Provider.of<QuestionsProvider>(context, listen: false).nextQuestion();
+    Product? product = Provider.of<SurveyDataProvider>(context, listen: false).product;
+    if (product == Product.test || product == Product.hr ) {
+      Navigator.push(context, MaterialPageRoute(builder: (context) => Mainscreen()));
+    } else {
+      showDialog(
+        barrierDismissible: false,
+        barrierColor: Colors.transparent,
+        context: context,
+        builder: (BuildContext context) {
+          return Dialog(
+            backgroundColor: Colors.transparent,
+            child: Center(
+              child: const CircularProgressIndicator(
+                color: Colors.blue,
+              ),
+            ),
+          );
+        },
+      );
+      await Provider.of<GoogleFunctionService>(context, listen: false).surveyStarted().then(
+        (value) {
+          if (context.mounted) {
+            Navigator.pop(context);
+          }
+        },
+      );
+      Navigator.push(context, MaterialPageRoute(builder: (context) => Mainscreen()));
+    }
+  }
+}
+
+class LogoSpinAnimation extends StatefulWidget {
+  const LogoSpinAnimation({super.key});
+
+  @override
+  State<LogoSpinAnimation> createState() => _LogoSpinAnimationState();
+}
+
+class _LogoSpinAnimationState extends State<LogoSpinAnimation> with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  late final Animation<double> _animation;
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(seconds: 5), // Total animation duration
+      vsync: this,
+    )..repeat();
+
+    // Create a custom curve for the spinning animation
+    _animation = CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeInOut,
+    ).drive(
+      Tween<double>(
+        begin: 0,
+        end: 1,
+      ).chain(
+        TweenSequence([
+          TweenSequenceItem(
+            tween: Tween<double>(begin: 0, end: 2) // Fast clockwise spin (2 rotations)
+                .chain(CurveTween(curve: Curves.easeOut)),
+            weight: 40,
+          ),
+          TweenSequenceItem(
+            tween: Tween<double>(begin: 2, end: 1.5) // Slower counterclockwise (half rotation back)
+                .chain(CurveTween(curve: Curves.easeInOut)),
+            weight: 60,
+          ),
+        ]),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return TextButton(
+        onPressed: () {
+          showDialog(
+            barrierDismissible: false,
+            barrierColor: Colors.transparent,
+            context: context,
+            builder: (BuildContext context) {
+              return Dialog(
+                backgroundColor: Colors.transparent,
+                child: Center(
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.all(Radius.circular(20)),
+                    child: RotationTransition(
+                      turns: _animation,
+                      child: Image.asset(
+                        'assets/logo/3transparent_logo.png',
+                        width: 100,
+                        height: 100,
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            },
+          );
+        },
+        child: Text("data"));
   }
 }

@@ -3,9 +3,9 @@ import 'package:front_survey_questions/changeNotifiers/questionsProvider.dart';
 import 'package:front_survey_questions/changeNotifiers/radioButtonsState.dart';
 import 'package:front_survey_questions/changeNotifiers/ratingBarState.dart';
 import 'package:front_survey_questions/changeNotifiers/surveyDataProvider.dart';
+import 'package:front_survey_questions/enums.dart';
 import 'package:front_survey_questions/helperClasses/questionMultipleChoice.dart';
 import 'package:front_survey_questions/screens/finalScreen.dart';
-import 'package:front_survey_questions/services/firestoreService.dart';
 import 'package:front_survey_questions/services/googleFunctionService.dart';
 import 'package:provider/provider.dart';
 
@@ -18,6 +18,7 @@ class CustomNextButton extends StatelessWidget {
       double result;
       QuestionsProvider questionsProvider = Provider.of<QuestionsProvider>(context, listen: false);
       SurveyDataProvider surveyDataProvider = Provider.of<SurveyDataProvider>(context, listen: false);
+      GoogleFunctionService googleFunctionService = Provider.of<GoogleFunctionService>(context, listen: false);
 
       // Go to first question
       if (questionsProvider.currentIndex == -1) {
@@ -44,20 +45,18 @@ class CustomNextButton extends StatelessWidget {
       questionsProvider.saveResult(result);
 
       if (questionsProvider.currentIndex < questionsProvider.questionLength - 1) {
+        // Go to Next Question.
         questionsProvider.nextQuestion();
       } else {
-        //Submit results
-        if (Provider.of<FirestoreService>(context, listen: false).surveyToken == 'test') {
-          try {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const FinalScreen(),
-              ),
-            );
-          } catch (e) {
-            print('Navigation error: $e');
-          }
+        // End of Survey. Submit results
+        if (surveyDataProvider.product == Product.test) {
+          // Test Survey. Dont submit anything
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const FinalScreen(),
+            ),
+          );
         } else {
           final results = questionsProvider.getResults();
           showDialog(
@@ -72,7 +71,7 @@ class CustomNextButton extends StatelessWidget {
                   ),
                 );
               });
-          await Provider.of<GoogleFunctionService>(context, listen: false).saveResults(surveyDataProvider.latestDocname, surveyDataProvider.emailType, results).then(
+          await Provider.of<GoogleFunctionService>(context, listen: false).saveResults(results).then(
             (_) {
               Navigator.pop(context);
             },
@@ -98,34 +97,31 @@ class CustomNextButton extends StatelessWidget {
     //TODO: Set correct widhts for Floating Buttons.
     return Padding(
       padding: MediaQuery.of(context).size.width > 600 ? const EdgeInsets.symmetric(vertical: 32) : const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
-      child: Container(
-        //constraints: BoxConstraints(maxWidth: 150, maxHeight: 50),
-        child: MaterialButton(
-          onPressed: () => nextQuestion(),
-          color: Color(0xFF3F94FF),
-          elevation: 4,
-          padding: EdgeInsets.all(20),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Consumer<QuestionsProvider>(
-                builder: (context, questionsProvider, child) {
-                  String buttonText = "Next";
-                  if (!questionsProvider.canGoForward) {
-                    buttonText = "Submit";
-                  }
-                  return Text(
-                    buttonText,
-                    style: TextStyle(color: Colors.white, fontFamily: 'Noto Sans', fontSize: 22 * 0.9),
-                  );
-                },
-              ),
-              const Icon(Icons.navigate_next_rounded, color: Colors.white, size: 24 * 0.9)
-            ],
-          ),
+      child: MaterialButton(
+        onPressed: () => nextQuestion(),
+        color: Color(0xFF3F94FF),
+        elevation: 4,
+        padding: EdgeInsets.all(20),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Consumer<QuestionsProvider>(
+              builder: (context, questionsProvider, child) {
+                String buttonText = "Next";
+                if (!questionsProvider.canGoForward) {
+                  buttonText = "Submit";
+                }
+                return Text(
+                  buttonText,
+                  style: TextStyle(color: Colors.white, fontFamily: 'Noto Sans', fontSize: 22 * 0.9),
+                );
+              },
+            ),
+            const Icon(Icons.navigate_next_rounded, color: Colors.white, size: 24 * 0.9)
+          ],
         ),
       ),
     );
