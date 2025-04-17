@@ -19,7 +19,7 @@ class TopComponent extends StatelessWidget {
     }
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
+      padding: const EdgeInsets.only(right: 24, left: 24, top: 40, bottom: 20),
       child: ConstrainedBox(
         constraints: BoxConstraints(maxWidth: desktop ? 500 : 300),
         child: Row(

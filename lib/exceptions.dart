@@ -24,6 +24,10 @@ class InvalidSurveyTokenException extends SurveyException {
   InvalidSurveyTokenException() : super('Incorrect Assessment link. Token', 'Invalid Survey Token');
 }
 
+class InvalidTokensException extends SurveyException {
+  InvalidTokensException() : super('Incorrect Assessment link.', 'Result Doc does not exist');
+}
+
 class SurveyAlreadyCompletedException extends SurveyException {
   SurveyAlreadyCompletedException() : super('Oops, This survey has already been completed', 'Survey Completed');
 }

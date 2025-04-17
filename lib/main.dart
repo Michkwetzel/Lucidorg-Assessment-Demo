@@ -6,7 +6,6 @@ import 'package:front_survey_questions/changeNotifiers/radioButtonsState.dart';
 import 'package:front_survey_questions/changeNotifiers/ratingBarState.dart';
 import 'package:front_survey_questions/exceptions.dart';
 import 'package:front_survey_questions/screens/errorScreen.dart';
-import 'package:front_survey_questions/screens/finalScreen.dart';
 import 'package:front_survey_questions/screens/welcomeScreen.dart';
 import 'package:front_survey_questions/services/firestoreService.dart';
 import 'package:front_survey_questions/services/googleFunctionService.dart';
@@ -36,17 +35,19 @@ Future<void> main() async {
     initializeLogging();
     String? surveyToken;
     String? companyUID;
+    String? jobSearchUID;
 
     final uri = Uri.parse(html.window.location.href);
 
     surveyToken = uri.queryParameters['token1'];
     companyUID = uri.queryParameters['token2'];
+    jobSearchUID = uri.queryParameters['token3'];
 
-    // surveyToken = 'JD0wS50bddkNLHe2SZ4x';
-    // companyUID = 'RhBs9nhOWigeGY8wVUEU';
+    surveyToken = 'u2ePiTvG03h5IVcvT9sD';
+    companyUID = 'RhBs9nhOWigeGY8wVUEU';
 
-    surveyToken = 'test';
-    companyUID = 'test';
+    // surveyToken = 'test';
+    // companyUID = 'test';
 
     if (surveyToken == null || companyUID == null) {
       throw MissingTokenException();
@@ -62,17 +63,21 @@ Future<void> main() async {
             ratingBarState: context.read<Ratingbarstate>(),
           ),
         ),
-        ChangeNotifierProvider(create: (context) => SurveyDataProvider(surveyUID: surveyToken, comapnyUID: companyUID)),
-        ChangeNotifierProvider(create: (context) => StartedProvider()),
+        ChangeNotifierProvider(create: (context) => SurveyDataProvider(surveyUID: surveyToken, companyUID: companyUID, jobSearchUID: jobSearchUID)),
+        ChangeNotifierProvider(
+          create: (context) => StartedProvider(surveyDataProvider: context.read<SurveyDataProvider>()),
+        ),
         Provider<FirestoreService>(
           create: (context) {
             final questionsProvider = Provider.of<QuestionsProvider>(context, listen: false);
-            return FirestoreService(questions: questionsProvider, surveyToken: surveyToken, companyUID: companyUID);
+            final surveyDataProvider = Provider.of<SurveyDataProvider>(context, listen: false);
+            return FirestoreService(questions: questionsProvider, surveyDataProvider: surveyDataProvider);
           },
           lazy: false,
         ),
         Provider<GoogleFunctionService>(create: (context) {
-          return GoogleFunctionService(surveyToken: surveyToken, companyUID: companyUID);
+          final surveyDataProvider = Provider.of<SurveyDataProvider>(context, listen: false);
+          return GoogleFunctionService(surveyDataProvider: surveyDataProvider);
         })
       ],
       child: MyApp(),

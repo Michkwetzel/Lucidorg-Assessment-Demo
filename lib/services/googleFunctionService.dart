@@ -1,36 +1,58 @@
+import 'package:front_survey_questions/changeNotifiers/surveyDataProvider.dart';
 import 'package:front_survey_questions/constants.dart';
+import 'package:front_survey_questions/enums.dart';
 import 'package:front_survey_questions/services/httpService.dart';
 import 'package:logging/logging.dart';
 
 class GoogleFunctionService {
-  String? surveyToken;
-  String? companyUID;
+  final SurveyDataProvider surveyDataProvider;
   Logger logger = Logger('GoogleFunctionService');
 
-  GoogleFunctionService({required this.surveyToken, required this.companyUID});
+  GoogleFunctionService({required this.surveyDataProvider});
 
-  Future<void> surveyStarted(String? latestDocname) async {
+  Future<void> surveyStarted() async {
     //Send companyUID, LastestSurveyDocName and surveyToken to back end so that it can change data
-    if (surveyToken == 'test') {
-      logger.info('Test Survey');
+    if (surveyDataProvider.surveyStarted) {
+      logger.info('Already started');
       return;
     }
-    Map<String, String> request = {'latestSurveyDocName': latestDocname!, 'companyUID': companyUID!, 'surveyUID': surveyToken!};
+    Map<String, String> request = {'latestSurveyDocName': surveyDataProvider.latestDocname!, 'companyUID': surveyDataProvider.companyUID!, 'surveyUID': surveyDataProvider.surveyUID!};
     String path = kSurveyStartedPath;
 
     await HttpService.postRequest(path: path, request: request);
-    logger.info('Survey Started for company: $companyUID, surveyToken: $surveyToken');
+    logger.info('Survey Started for company: ${surveyDataProvider.companyUID}, surveyToken: ${surveyDataProvider.surveyUID}');
   }
 
-  Future<void> saveResults(String? latestDocname, String? emailType, List<int> results) async {
-    //Send companyUID, LastestSurveyDocName and surveyToken to back end so that it can change data
-    print(results);
+  Future<void> saveResults(List<int> results) async {
+    //Send companyUID, LastestSurveyDocName and surveyToken to back end
+    Map<String, dynamic> request = {};
+    String path = '';
 
-    Map<String, dynamic> request = {'latestSurveyDocName': latestDocname, 'emailType': emailType, 'companyUID': companyUID!, 'surveyUID': surveyToken!, 'results': results};
-    String path = ksaveResultsPath;
+    if (surveyDataProvider.product == Product.hr) {
+      request = {
+        'jobSearchUID': surveyDataProvider.jobSearchUID,
+        'companyUID': surveyDataProvider.companyUID!,
+        'surveyUID': surveyDataProvider.surveyUID!,
+        'results': results,
+      };
+      path = ksaveResultsPath_HR;
+    } else {
+      request = {
+        'latestSurveyDocName': surveyDataProvider.latestDocname,
+        'emailType': surveyDataProvider.emailType,
+        'companyUID': surveyDataProvider.companyUID!,
+        'surveyUID': surveyDataProvider.surveyUID!,
+        'results': results
+      };
+      path = ksaveResultsPath;
+    }
 
     await HttpService.postRequest(path: path, request: request);
-    logger.info('Saved results to back end for company: $companyUID, surveyToken: $surveyToken');
+    logger.info('Saved results to back end for company: ${surveyDataProvider.companyUID}, surveyToken: ${surveyDataProvider.surveyUID}, product: ${surveyDataProvider.product}');
+  }
+
+  Future<void> addNewQuestionsCall() async {
+    await HttpService.postRequest(path: kupdateNewSurveyQuestionsPath, request: {'product': 'HR'});
   }
 
   Future<void> pushTestResults() async {

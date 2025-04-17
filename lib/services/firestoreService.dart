@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:front_survey_questions/changeNotifiers/questionsProvider.dart';
+import 'package:front_survey_questions/changeNotifiers/surveyDataProvider.dart';
 import 'package:front_survey_questions/exceptions.dart';
 import 'package:front_survey_questions/helperClasses/questionMultipleChoice.dart';
 import 'package:front_survey_questions/helperClasses/questionRating.dart';
@@ -10,24 +11,27 @@ import 'package:front_survey_questions/enums.dart';
 class FirestoreService {
   final log = Logger("FireStoreService");
   final QuestionsProvider questions;
-  final String? surveyToken;
-  final String? companyUID;
-  DocumentReference<Map<String, dynamic>>? resultsDocRef;
-  String? latestSurveyDocName;
+  final SurveyDataProvider surveyDataProvider;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  FirestoreService({required this.questions, required this.surveyToken, required this.companyUID});
+  FirestoreService({required this.questions, required this.surveyDataProvider});
 
   ///Method that reads latest version question doc from firestore
   ///Creates Question object for each q in doc map
   ///Adds Questions to QuestionProvider
-  Future<void> getQuestions(String companyName) async {
-    const String collection = 'surveyBuild';
-    const String docID = 'v.2025-03-26';
+  Future<void> getQuestions() async {
+    String collection = 'surveyBuild';
+    String docID = 'v.2025-03-26';
+
+    // Check if HR
+    if (surveyDataProvider.product == Product.hr) {
+      collection = 'surveyBuild_HR';
+      docID = 'v.2025-04-16';
+    }
 
     final ref = _firestore.collection(collection).doc(docID);
 
-    log.info("Calling getQuestion to read questions from fireStore. ref: $ref");
+    log.info("Calling getQuestion to read questions from fireStore. ref: $collection, $docID");
     try {
       final docSnapshot = await ref.get();
 
@@ -61,76 +65,6 @@ class FirestoreService {
       ]);
       log.severe("Failed to get Questions from Firestore: $e. Stacktrace: $stackTrace");
     }
-  }
-
-  Future<void> saveResults(List<int> results) async {
-    // Turn result list into Map with qNUmbers
-    Map<String, int> resultsMap = {};
-    for (int i = 0; i < results.length; i++) {
-      int qNumber = i + 1;
-      resultsMap['q$qNumber'] = results[i];
-    }
-
-    resultsDocRef?.update({'results': resultsMap, 'finished': true});
-  }
-
-  Future<List<dynamic>> checkTokens() async {
-    if (surveyToken == 'test') {
-      log.info('Test Survey');
-      return ["test", "test"];
-    }
-    if (surveyToken == null || companyUID == null) {
-      //Check if token exists. if not. error
-      throw MissingTokenException();
-    }
-    // Now check if tokens are valid. firstly companyUID exists.
-    final docCompanyUIDSnapshot = await _firestore.collection('surveyData').doc(companyUID).get();
-    if (!docCompanyUIDSnapshot.exists) {
-      throw CompanyNotFoundException();
-    }
-
-    // Read latest doc name from company Doc
-    await getCurrentSurveyDocName(docCompanyUIDSnapshot);
-
-    resultsDocRef = _firestore.collection('surveyData/$companyUID/$latestSurveyDocName').doc(surveyToken); //Get the results document where results should be saved in
-    final docSnapshot = await resultsDocRef?.get();
-    if (docSnapshot == null || !docSnapshot.exists) {
-      throw InvalidSurveyTokenException();
-    }
-
-    //Lastly if all good up to here. Then tokens are correct. Now check if alraedy finished.
-    if (docSnapshot.data()?['finished'] == true) {
-      throw SurveyAlreadyCompletedException();
-    }
-
-    bool started = docSnapshot.data()?['started'];
-    String emailType = docSnapshot.data()?['emailType'];
-
-    return [emailType, latestSurveyDocName, started];
-  }
-
-  Future<void> getCurrentSurveyDocName(var docCompanyUIDSnapshot) async {
-    //Get the current assessment. It will be the latest doc.
-    try {
-      latestSurveyDocName = docCompanyUIDSnapshot.data()?['latestSurvey']; //Get latest survey
-      if (latestSurveyDocName == null) {
-        throw NoActiveSurveyException();
-      }
-    } on Exception catch (e) {
-      if (e is SurveyException) {
-        rethrow;
-      }
-      log.severe('Error setting up Survey $e');
-      throw SurveyException('An unexpected error occurred while setting up the survey', 'Setup Error');
-    }
-  }
-
-  Future<String?> getCompanyName() async {
-    final docsnapshot = await _firestore.collection('surveyData').doc(companyUID).get();
-    final Map<String, dynamic> companyInfo = docsnapshot.data()!['companyInfo'];
-    final companyName = companyInfo['companyName'];
-    print(companyName);
-    return companyName;
   }
 
   void addQuestiontoDB() {
@@ -286,9 +220,5 @@ class FirestoreService {
         'textHeading': "Believes their workload is manageable, allowing them to be productive without feeling overwhelmed",
       },
     };
-
-    _firestore.collection('surveyBuild').doc('v.2025-03-26').set({
-      'multipleChoice': multipleChoiceQuestions,
-    });
   }
 }

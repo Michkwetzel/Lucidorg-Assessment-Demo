@@ -9,3 +9,5 @@ enum QuestionType {
   multipleChoice,
   error,
 }
+
+enum Product {hr, org, test}
