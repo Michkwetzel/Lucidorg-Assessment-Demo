@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:front_survey_questions/changeNotifiers/radioButtonsState.dart';
-import 'package:front_survey_questions/changeNotifiers/ratingBarState.dart';
-import 'package:front_survey_questions/components/questionLayout/multipleChoiceQuestion/multiple_choice_question_card.dart';
-import 'package:front_survey_questions/components/questionLayout/ratingQuestion/rating_question_card.dart';
-import 'package:front_survey_questions/enums.dart';
-import 'package:front_survey_questions/helperClasses/questionBase.dart';
-import 'package:front_survey_questions/helperClasses/questionMultipleChoice.dart';
-import 'package:front_survey_questions/helperClasses/questionRating.dart';
+import 'package:lucid_org/changeNotifiers/radioButtonsState.dart';
+import 'package:lucid_org/changeNotifiers/ratingBarState.dart';
+import 'package:lucid_org/components/questionLayout/multipleChoiceQuestion/multiple_choice_question_card.dart';
+import 'package:lucid_org/components/questionLayout/ratingQuestion/rating_question_card.dart';
+import 'package:lucid_org/enums.dart';
+import 'package:lucid_org/helperClasses/questionBase.dart';
+import 'package:lucid_org/helperClasses/questionMultipleChoice.dart';
+import 'package:lucid_org/helperClasses/questionRating.dart';
 import 'package:logging/logging.dart';
 
 class QuestionsProvider extends ChangeNotifier {
@@ -123,7 +123,6 @@ class QuestionsProvider extends ChangeNotifier {
   }
 
   void saveResult(double result) {
-    // If result -2 then it is first card.
     log.info('Saving result ListIndex: $_currentIndex, Q${currentQuestion.index} Result: $result');
 
     currentQuestion.result = result;

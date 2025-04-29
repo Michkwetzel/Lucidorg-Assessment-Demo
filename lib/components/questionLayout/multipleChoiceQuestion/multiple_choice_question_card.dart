@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:front_survey_questions/changeNotifiers/radioButtonsState.dart';
-import 'package:front_survey_questions/components/questionLayout/multipleChoiceQuestion/radio_button_card.dart';
-import 'package:front_survey_questions/constants.dart';
+import 'package:lucid_org/changeNotifiers/radioButtonsState.dart';
+import 'package:lucid_org/components/questionLayout/multipleChoiceQuestion/radio_button_card.dart';
+import 'package:lucid_org/constants.dart';
 import 'package:provider/provider.dart';
 
 class MultipleChoiceQuestionCard extends StatelessWidget {
@@ -10,10 +10,11 @@ class MultipleChoiceQuestionCard extends StatelessWidget {
   final String textHeading;
 
   MultipleChoiceQuestionCard({super.key, required this.options, required this.textHeading}) : radioButtonCards = [] {
-    int counter = 1;
+    // Index is descending Since Agree is first and Dissagree is last.
+    int counter = 7;
     for (String option in options) {
       radioButtonCards.add(RadioButtonCard(text: option, radioButtonIndex: counter));
-      counter++;
+      counter--;
     }
   }
 

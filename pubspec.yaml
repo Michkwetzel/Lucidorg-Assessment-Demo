@@ -1,9 +1,9 @@
-name: front_survey_questions
-description: "A new Flutter project."
+name: lucid_org
+description: "Organizational efficiency platform"
 
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
-version: 1.0.0+1
+version: 2.1.2
 
 environment:
   sdk: '>=3.4.3 <4.0.0'

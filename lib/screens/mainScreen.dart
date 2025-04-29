@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:front_survey_questions/changeNotifiers/questionsProvider.dart';
-import 'package:front_survey_questions/components/custonButtons/custom_back_button.dart';
-import 'package:front_survey_questions/components/custonButtons/custom_next_button.dart';
-import 'package:front_survey_questions/components/questionLayout/custom_progress_bar.dart';
-import 'package:front_survey_questions/components/questionLayout/top_component.dart';
+import 'package:lucid_org/changeNotifiers/questionsProvider.dart';
+import 'package:lucid_org/components/custonButtons/custom_back_button.dart';
+import 'package:lucid_org/components/custonButtons/custom_next_button.dart';
+import 'package:lucid_org/components/questionLayout/custom_progress_bar.dart';
+import 'package:lucid_org/components/questionLayout/top_component.dart';
 import 'package:provider/provider.dart';
 
 class Mainscreen extends StatelessWidget {

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:front_survey_questions/changeNotifiers/ratingBarState.dart';
-import 'package:front_survey_questions/components/questionLayout/ratingQuestion/rating_button.dart';
-import 'package:front_survey_questions/constants.dart';
+import 'package:lucid_org/changeNotifiers/ratingBarState.dart';
+import 'package:lucid_org/components/questionLayout/ratingQuestion/rating_button.dart';
+import 'package:lucid_org/constants.dart';
 import 'package:provider/provider.dart';
 
 class CustomRatingBar extends StatelessWidget {

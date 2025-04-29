@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:front_survey_questions/constants.dart';
+import 'package:lucid_org/constants.dart';
 
 class FinalScreen extends StatelessWidget {
   const FinalScreen({super.key});

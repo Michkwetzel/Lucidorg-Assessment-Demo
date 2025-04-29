@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:front_survey_questions/changeNotifiers/questionsProvider.dart';
-import 'package:front_survey_questions/changeNotifiers/radioButtonsState.dart';
-import 'package:front_survey_questions/changeNotifiers/ratingBarState.dart';
-import 'package:front_survey_questions/changeNotifiers/surveyDataProvider.dart';
-import 'package:front_survey_questions/enums.dart';
-import 'package:front_survey_questions/helperClasses/questionMultipleChoice.dart';
-import 'package:front_survey_questions/screens/finalScreen.dart';
-import 'package:front_survey_questions/services/googleFunctionService.dart';
+import 'package:lucid_org/changeNotifiers/questionsProvider.dart';
+import 'package:lucid_org/changeNotifiers/radioButtonsState.dart';
+import 'package:lucid_org/changeNotifiers/ratingBarState.dart';
+import 'package:lucid_org/changeNotifiers/surveyDataProvider.dart';
+import 'package:lucid_org/enums.dart';
+import 'package:lucid_org/helperClasses/questionMultipleChoice.dart';
+import 'package:lucid_org/screens/finalScreen.dart';
+import 'package:lucid_org/services/googleFunctionService.dart';
 import 'package:provider/provider.dart';
 
 class CustomNextButton extends StatelessWidget {
