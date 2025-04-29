@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:front_survey_questions/enums.dart';
-import 'package:front_survey_questions/exceptions.dart';
+import 'package:lucid_org/enums.dart';
+import 'package:lucid_org/exceptions.dart';
 
 // This class ensures All config data is uploaded at start and available for the rest of the app
 class SurveyDataProvider extends ChangeNotifier {
@@ -106,5 +106,9 @@ class SurveyDataProvider extends ChangeNotifier {
     print('product: $product');
     print('companyName: $companyName');
     print('surveyStarted: $surveyStarted');
+  }
+
+  void setSurveyStartedTrue() {
+    surveyStarted = true;
   }
 }

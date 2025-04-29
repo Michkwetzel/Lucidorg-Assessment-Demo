@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:front_survey_questions/changeNotifiers/startedProvider.dart';
-import 'package:front_survey_questions/changeNotifiers/surveyDataProvider.dart';
-import 'package:front_survey_questions/changeNotifiers/questionsProvider.dart';
-import 'package:front_survey_questions/components/custonButtons/custom_start_button.dart';
-import 'package:front_survey_questions/constants.dart';
-import 'package:front_survey_questions/enums.dart';
-import 'package:front_survey_questions/exceptions.dart';
-import 'package:front_survey_questions/screens/errorScreen.dart';
-import 'package:front_survey_questions/screens/loading_screen.dart';
-import 'package:front_survey_questions/screens/mainScreen.dart';
-import 'package:front_survey_questions/services/firestoreService.dart';
-import 'package:front_survey_questions/services/googleFunctionService.dart';
+import 'package:lucid_org/changeNotifiers/surveyDataProvider.dart';
+import 'package:lucid_org/changeNotifiers/questionsProvider.dart';
+import 'package:lucid_org/components/custonButtons/custom_start_button.dart';
+import 'package:lucid_org/constants.dart';
+import 'package:lucid_org/enums.dart';
+import 'package:lucid_org/exceptions.dart';
+import 'package:lucid_org/screens/errorScreen.dart';
+import 'package:lucid_org/screens/loading_screen.dart';
+import 'package:lucid_org/screens/mainScreen.dart';
+import 'package:lucid_org/services/firestoreService.dart';
+import 'package:lucid_org/services/googleFunctionService.dart';
 import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
 

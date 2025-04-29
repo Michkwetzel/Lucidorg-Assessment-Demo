@@ -105,6 +105,8 @@ const String kSurveyStartedPath = 'https://surveystarted-rbyavkqn2a-uc.a.run.app
 const String ksaveResultsPath = 'https://saveresults-rbyavkqn2a-uc.a.run.app';
 // const String ksaveResultsPath = 'http://127.0.0.1:5001/efficiency-1st/us-central1/saveResults';
 
-const String kupdateNewSurveyQuestionsPath = 'http://127.0.0.1:5001/efficiency-1st/us-central1/updateNewSurveyQuestions';
+const String kupdateNewSurveyQuestionsPath = ' https://updatenewsurveyquestions-rbyavkqn2a-uc.a.run.app';
+// const String kupdateNewSurveyQuestionsPath = 'http://127.0.0.1:5001/efficiency-1st/us-central1/updateNewSurveyQuestions';
 
-const String ksaveResultsPath_HR = 'http://127.0.0.1:5001/efficiency-1st/us-central1/saveResults_HR';
+const String ksaveResultsPath_HR = 'https://saveresults-hr-rbyavkqn2a-uc.a.run.app/';
+// const String ksaveResultsPath_HR = 'http://127.0.0.1:5001/efficiency-1st/us-central1/saveResults_HR';

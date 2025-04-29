@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:front_survey_questions/changeNotifiers/radioButtonsState.dart';
-import 'package:front_survey_questions/constants.dart';
+import 'package:lucid_org/changeNotifiers/radioButtonsState.dart';
+import 'package:lucid_org/constants.dart';
 import 'package:provider/provider.dart';
 
 class RadioButtonCard extends StatelessWidget {

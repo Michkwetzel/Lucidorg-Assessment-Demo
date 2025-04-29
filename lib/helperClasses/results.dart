@@ -1,4 +1,4 @@
-import 'package:front_survey_questions/enums.dart';
+import 'package:lucid_org/enums.dart';
 import 'package:logging/logging.dart';
 
 final log = Logger("Results");

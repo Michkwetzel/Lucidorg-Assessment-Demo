@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:front_survey_questions/changeNotifiers/ratingBarState.dart';
-import 'package:front_survey_questions/components/custonButtons/info_button.dart';
-import 'package:front_survey_questions/components/questionLayout/ratingQuestion/custom_rating_bar.dart';
-import 'package:front_survey_questions/constants.dart';
+import 'package:lucid_org/changeNotifiers/ratingBarState.dart';
+import 'package:lucid_org/components/custonButtons/info_button.dart';
+import 'package:lucid_org/components/questionLayout/ratingQuestion/custom_rating_bar.dart';
+import 'package:lucid_org/constants.dart';
 import 'package:provider/provider.dart';
 
 class RatingQuestionCard extends StatelessWidget {

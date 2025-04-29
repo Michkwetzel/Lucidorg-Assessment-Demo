@@ -1,11 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:front_survey_questions/changeNotifiers/questionsProvider.dart';
-import 'package:front_survey_questions/changeNotifiers/surveyDataProvider.dart';
-import 'package:front_survey_questions/exceptions.dart';
-import 'package:front_survey_questions/helperClasses/questionMultipleChoice.dart';
-import 'package:front_survey_questions/helperClasses/questionRating.dart';
+import 'package:lucid_org/changeNotifiers/questionsProvider.dart';
+import 'package:lucid_org/changeNotifiers/surveyDataProvider.dart';
+import 'package:lucid_org/exceptions.dart';
+import 'package:lucid_org/helperClasses/questionMultipleChoice.dart';
+import 'package:lucid_org/helperClasses/questionRating.dart';
 import 'package:logging/logging.dart';
-import 'package:front_survey_questions/enums.dart';
+import 'package:lucid_org/enums.dart';
 
 ///Service class interacting with firestore
 class FirestoreService {

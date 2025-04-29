@@ -1,4 +1,4 @@
-import 'package:front_survey_questions/helperClasses/questionBase.dart';
+import 'package:lucid_org/helperClasses/questionBase.dart';
 
 class Questionmultiplechoice extends QuestionBase {
   final List<dynamic> options;
