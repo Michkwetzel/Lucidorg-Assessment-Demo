@@ -42,8 +42,8 @@ Future<void> main() async {
     companyUID = uri.queryParameters['token2'];
     jobSearchUID = uri.queryParameters['token3'];
 
-    // surveyToken = 'u2ePiTvG03h5IVcvT9sD';
-    // companyUID = 'RhBs9nhOWigeGY8wVUEU';
+    surveyToken = 'sDpEZWVGf0NXD4de1jWe';
+    companyUID = 'Xx49cPZF4glQdGJJVeRv';
 
     // surveyToken = 'test';
     // companyUID = 'test';
