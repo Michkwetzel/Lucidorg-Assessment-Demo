@@ -12,7 +12,7 @@ class Questionmultiplechoice extends QuestionBase {
       'Strongly agree',
       'Agree',
       'Slightly agree',
-      'Neither agree not disagree',
+      'Neither agree nor disagree',
       'Slightly disagree',
       'Disagree',
       'Strongly disagree',
