@@ -5,6 +5,39 @@ import 'package:logging/logging.dart';
 class HttpService {
   static final Logger logger = Logger("HttpService");
 
+  static Future<dynamic> getRequest({required String path, Map<String, String>? queryParams, Map<String, String>? additionalHeaders}) async {
+    // Build URI with query parameters if provided
+    Uri uri;
+    if (queryParams != null && queryParams.isNotEmpty) {
+      uri = Uri.parse(path).replace(queryParameters: queryParams);
+    } else {
+      uri = Uri.parse(path);
+    }
+
+    final headers = <String, String>{
+      'Content-Type': 'application/json',
+    };
+
+    // Add additional headers if provided
+    if (additionalHeaders != null) {
+      headers.addAll(additionalHeaders);
+    }
+
+    try {
+      logger.info("GET Request: URL=$uri, Headers=${headers.toString()}");
+
+      final response = await http.get(uri, headers: headers);
+
+      return _handleResponse(response);
+    } on http.ClientException catch (e) {
+      logger.severe('Network error: ${e.message}');
+      throw HttpRequestException('Network error: Unable to connect to server. Details: ${e.message}');
+    } catch (e) {
+      logger.severe('Unexpected error: ${e.toString()}');
+      throw HttpRequestException(e.toString());
+    }
+  }
+
   static Future<dynamic> postRequest({required String path, required Map<String, dynamic> request, Map<String, String>? additionalHeaders}) async {
     final uri = Uri.parse(path);
     final headers = {

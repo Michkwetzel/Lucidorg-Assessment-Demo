@@ -6,7 +6,6 @@ import 'package:lucid_org/changeNotifiers/ratingBarState.dart';
 import 'package:lucid_org/exceptions.dart';
 import 'package:lucid_org/screens/errorScreen.dart';
 import 'package:lucid_org/screens/welcomeScreen.dart';
-import 'package:lucid_org/services/firestoreService.dart';
 import 'package:lucid_org/services/googleFunctionService.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -32,23 +31,24 @@ Future<void> main() async {
     );
 
     initializeLogging();
-    String? surveyToken;
-    String? companyUID;
-    String? jobSearchUID;
+    String? orgId;
+    String? assessmentId;
+    String? docId;
 
     final uri = Uri.parse(html.window.location.href);
 
-    surveyToken = uri.queryParameters['token1'];
-    companyUID = uri.queryParameters['token2'];
-    jobSearchUID = uri.queryParameters['token3'];
+    orgId = uri.queryParameters['orgId'];
+    assessmentId = uri.queryParameters['assessmentId'];
+    docId = uri.queryParameters['docId'];
 
-    surveyToken = 'sDpEZWVGf0NXD4de1jWe';
-    companyUID = 'Xx49cPZF4glQdGJJVeRv';
+    orgId = 'test';
+    assessmentId = 'test';
+    docId = 'test';
 
     // surveyToken = 'test';
     // companyUID = 'test';
 
-    if (surveyToken == null || companyUID == null) {
+    if (orgId == null || assessmentId == null || docId == null) {
       throw MissingTokenException();
     }
 
@@ -62,18 +62,10 @@ Future<void> main() async {
             ratingBarState: context.read<Ratingbarstate>(),
           ),
         ),
-        ChangeNotifierProvider(create: (context) => SurveyDataProvider(surveyUID: surveyToken, companyUID: companyUID, jobSearchUID: jobSearchUID)),
-        Provider<FirestoreService>(
-          create: (context) {
-            final questionsProvider = Provider.of<QuestionsProvider>(context, listen: false);
-            final surveyDataProvider = Provider.of<SurveyDataProvider>(context, listen: false);
-            return FirestoreService(questions: questionsProvider, surveyDataProvider: surveyDataProvider);
-          },
-          lazy: false,
-        ),
+        ChangeNotifierProvider(create: (context) => SurveyDataProvider(orgId: orgId, assessmentID: assessmentId, docId: docId, googleFunctionService: Provider.of<GoogleFunctionService>(context, listen: false))),
         Provider<GoogleFunctionService>(create: (context) {
           final surveyDataProvider = Provider.of<SurveyDataProvider>(context, listen: false);
-          return GoogleFunctionService(surveyDataProvider: surveyDataProvider);
+          return GoogleFunctionService(surveyDataProvider: surveyDataProvider, questionsProvider: Provider.of<QuestionsProvider>(context, listen: false));
         })
       ],
       child: MyApp(),

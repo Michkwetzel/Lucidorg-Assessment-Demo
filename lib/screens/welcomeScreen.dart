@@ -8,7 +8,6 @@ import 'package:lucid_org/exceptions.dart';
 import 'package:lucid_org/screens/errorScreen.dart';
 import 'package:lucid_org/screens/loading_screen.dart';
 import 'package:lucid_org/screens/mainScreen.dart';
-import 'package:lucid_org/services/firestoreService.dart';
 import 'package:lucid_org/services/googleFunctionService.dart';
 import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
@@ -43,14 +42,14 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       });
     }
     try {
-      final firestoreService = Provider.of<FirestoreService>(context, listen: false);
       final surveyDataProvider = Provider.of<SurveyDataProvider>(context, listen: false);
+      final googleFunctionService = Provider.of<GoogleFunctionService>(context, listen: false);
 
       // First Check tokens and get current Assssment DocName
-      await surveyDataProvider.checkTokensandLoadData();
+      await surveyDataProvider.init();
 
       // Get Questions
-      await firestoreService.getQuestions();
+      await googleFunctionService.getQuestions();
 
       // Done Loading
       if (mounted) {
@@ -131,8 +130,7 @@ class WelcomeScreenComponentLayout extends StatelessWidget {
                       // For updating data
                       // CustomStartButton(
                       //   onPressed: () async {
-                      //     // Provider.of<FirestoreService>(context, listen: false).addQuestiontoDB();
-                      //     Provider.of<GoogleFunctionService>(context, listen: false).addNewQuestionsCall();
+                      //     Provider.of<FirestoreService>(context, listen: false).addQuestiontoDB();
                       //   },
                       // ),
                     ],
@@ -149,7 +147,7 @@ class WelcomeScreenComponentLayout extends StatelessWidget {
   Future<void> onSurveyStarted(BuildContext context) async {
     Provider.of<QuestionsProvider>(context, listen: false).nextQuestion();
     Product? product = Provider.of<SurveyDataProvider>(context, listen: false).product;
-    if (product == Product.test || product == Product.hr ) {
+    if (product == Product.test) {
       Navigator.push(context, MaterialPageRoute(builder: (context) => Mainscreen()));
     } else {
       showDialog(
