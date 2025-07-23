@@ -10,4 +10,4 @@ enum QuestionType {
   error,
 }
 
-enum Product {hr, org, test}
+enum Product {org, test}
