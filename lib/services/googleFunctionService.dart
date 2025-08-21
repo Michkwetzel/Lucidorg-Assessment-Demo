@@ -1,38 +1,28 @@
-import 'package:lucid_org/changeNotifiers/questionsProvider.dart';
-import 'package:lucid_org/changeNotifiers/surveyDataProvider.dart';
 import 'package:lucid_org/constants.dart';
-import 'package:lucid_org/enums.dart';
 import 'package:lucid_org/exceptions.dart';
-import 'package:lucid_org/helperClasses/questionMultipleChoice.dart';
-import 'package:lucid_org/helperClasses/questionRating.dart';
 import 'package:lucid_org/services/httpService.dart';
 import 'package:logging/logging.dart';
 
 class GoogleFunctionService {
-  final SurveyDataProvider surveyDataProvider;
-  final QuestionsProvider questionsProvider;
+  static Logger logger = Logger('GoogleFunctionService');
 
-  Logger logger = Logger('GoogleFunctionService');
-
-  GoogleFunctionService({required this.questionsProvider, required this.surveyDataProvider});
-
-  Future<void> surveyStarted() async {
+  static Future<bool> surveyStarted(String orgId, String assessmentId, String docId, bool alreadyStarted) async {
     // Survey Already started. No Need to do call to back end.
-    if (surveyDataProvider.surveyStarted) {
+    if (alreadyStarted) {
       logger.info('Already started');
-      return;
+      return true;
     }
 
     try {
-      Map<String, String> request = {'orgId': surveyDataProvider.orgId!, 'assessmentId': surveyDataProvider.assessmentID!, 'docId': surveyDataProvider.docId!};
+      Map<String, String> request = {'orgId': orgId, 'assessmentId': assessmentId, 'docId': docId};
 
       final response = await HttpService.postRequest(
-          path: kSurveyStartedPath, // Your existing constant
+          path: kSurveyStartedPath,
           request: request);
 
       if (response['success']) {
-        surveyDataProvider.setSurveyStartedTrue();
-        logger.info('Survey Started for company: ${surveyDataProvider.orgId}, docId: ${surveyDataProvider.docId}');
+        logger.info('Survey Started for company: $orgId, docId: $docId');
+        return true;
       } else {
         throw Exception(response['error'] ?? 'Failed to start survey');
       }
@@ -42,16 +32,16 @@ class GoogleFunctionService {
     }
   }
 
-  Future<void> saveResults(List<int> results) async {
+  static Future<void> saveResults(String orgId, String assessmentId, String docId, List<int> results) async {
     try {
-      Map<String, dynamic> request = {'orgId': surveyDataProvider.orgId!, 'assessmentId': surveyDataProvider.assessmentID!, 'docId': surveyDataProvider.docId!, 'results': results};
+      Map<String, dynamic> request = {'orgId': orgId, 'assessmentId': assessmentId, 'docId': docId, 'results': results};
 
       final response = await HttpService.postRequest(
-          path: kSaveResultsPath, // Add this constant to your constants file
+          path: kSaveResultsPath,
           request: request);
 
       if (response['success']) {
-        logger.info('Results saved successfully for docId: ${surveyDataProvider.docId}');
+        logger.info('Results saved successfully for docId: $docId');
       } else {
         throw Exception(response['error'] ?? 'Failed to save results');
       }
@@ -61,36 +51,19 @@ class GoogleFunctionService {
     }
   }
 
-  Future<void> getQuestions() async {
+  static Future<Map<String, dynamic>> getQuestions() async {
     try {
       final response = await HttpService.getRequest(path: kGetQuestionsPath);
       if (response['success']) {
-        Map<String, dynamic> multipleChoiceQuestions = response['data']['multipleChoice'];
-        int count = 0;
-
-        multipleChoiceQuestions.forEach((key, value) {
-          count++;
-          questionsProvider.addQuestion(Questionmultiplechoice(
-            textHeading: value['textHeading'] ?? 'Default Text',
-            textExtra: value['textExtra'],
-            index: value['index'],
-            type: QuestionType.multipleChoice,
-          ));
-        });
-
-        print("$count Multiple choice Questions loaded into QuestionsProvider.");
-        questionsProvider.sortQuestions();
-        print("getQuestions from FireStore successful");
+        Map<String, dynamic> multipleChoiceQuestions = response['data'];
+        print("Questions loaded successfully from backend.");
+        return {'success': true, 'questions': multipleChoiceQuestions};
+      } else {
+        return {'success': false, 'error': 'Failed to load questions'};
       }
     } on Exception catch (e) {
-      questionsProvider.setQuestions([
-        QuestionRating(
-          textHeading: "This is akward",
-          textBody: 'There was an error getting the question. Please refresh the browser',
-          index: 0,
-          type: QuestionType.error,
-        )
-      ]);
+      logger.severe('Error getting questions: $e');
+      return {'success': false, 'error': e.toString()};
     }
   }
 
@@ -109,14 +82,14 @@ class GoogleFunctionService {
 
   // Add these methods to your GoogleFunctionService class
 
-  Future<bool> checkDataDocStatus() async {
+  static Future<bool> checkDataDocStatus(String orgId, String assessmentId, String docId) async {
     try {
       logger.info("Checking dataDoc status.");
 
-      Map<String, dynamic> request = {'orgId': surveyDataProvider.orgId!, 'assessmentId': surveyDataProvider.assessmentID!, 'docId': surveyDataProvider.docId!};
+      Map<String, dynamic> request = {'orgId': orgId, 'assessmentId': assessmentId, 'docId': docId};
 
       final response = await HttpService.postRequest(
-          path: kCheckDataDocStatusPath, // Add this constant to your constants file
+          path: kCheckDataDocStatusPath,
           request: request);
 
       if (response['success']) {
@@ -138,12 +111,12 @@ class GoogleFunctionService {
     }
   }
 
-  Future<String> getCompanyName() async {
+  static Future<String> getCompanyName(String orgId) async {
     try {
-      Map<String, dynamic> request = {'orgId': surveyDataProvider.orgId!};
+      Map<String, dynamic> request = {'orgId': orgId};
 
       final response = await HttpService.postRequest(
-          path: kGetCompanyNamePath, // Add this constant to your constants file
+          path: kGetCompanyNamePath,
           request: request);
 
       if (response['success']) {

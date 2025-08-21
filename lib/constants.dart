@@ -98,9 +98,17 @@ const kRatingBarHintTextStyle = TextStyle(
 );
 
 // Google Cloud Function endpoints
-const String kCheckDataDocStatusPath = 'http://127.0.0.1:5001/efficiency-1st/us-central1/checkDataDocStatus';
-const String kGetCompanyNamePath = 'http://127.0.0.1:5001/efficiency-1st/us-central1/getCompanyName';
-const String kGetQuestionsPath = 'http://127.0.0.1:5001/efficiency-1st/us-central1/getQuestions';
-const String kSaveResultsPath = 'http://127.0.0.1:5001/efficiency-1st/us-central1/saveResults';
-const String kSendAssessmentToBlockIdsPath = 'http://127.0.0.1:5001/efficiency-1st/us-central1/sendAssessmentToBlockIds';
-const String kSurveyStartedPath = 'http://127.0.0.1:5001/efficiency-1st/us-central1/surveyStarted';
+// const String kCheckDataDocStatusPath = 'http://127.0.0.1:5001/efficiency-1st/us-central1/checkDataDocStatus';
+const String kCheckDataDocStatusPath = 'https://us-central1-efficiency-1st.cloudfunctions.net/checkDataDocStatusV2';
+
+// const String kGetCompanyNamePath = 'http://127.0.0.1:5001/efficiency-1st/us-central1/getCompanyName';
+const String kGetCompanyNamePath = 'https://us-central1-efficiency-1st.cloudfunctions.net/getCompanyNameV2';
+
+// const String kGetQuestionsPath = 'http://127.0.0.1:5001/efficiency-1st/us-central1/getQuestions';
+const String kGetQuestionsPath = 'https://us-central1-efficiency-1st.cloudfunctions.net/getQuestionsV2';
+
+// const String kSaveResultsPath = 'http://127.0.0.1:5001/efficiency-1st/us-central1/saveResults';
+const String kSaveResultsPath = 'https://us-central1-efficiency-1st.cloudfunctions.net/saveResultsV2';
+
+// const String kSurveyStartedPath = 'http://127.0.0.1:5001/efficiency-1st/us-central1/surveyStarted';
+const String kSurveyStartedPath = 'https://us-central1-efficiency-1st.cloudfunctions.net/surveyStartedV2';

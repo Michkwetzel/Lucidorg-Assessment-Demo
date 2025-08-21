@@ -6,7 +6,6 @@ import 'package:lucid_org/changeNotifiers/ratingBarState.dart';
 import 'package:lucid_org/exceptions.dart';
 import 'package:lucid_org/screens/errorScreen.dart';
 import 'package:lucid_org/screens/welcomeScreen.dart';
-import 'package:lucid_org/services/googleFunctionService.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
@@ -45,9 +44,6 @@ Future<void> main() async {
     assessmentId = 'test';
     docId = 'test';
 
-    // surveyToken = 'test';
-    // companyUID = 'test';
-
     if (orgId == null || assessmentId == null || docId == null) {
       throw MissingTokenException();
     }
@@ -62,11 +58,7 @@ Future<void> main() async {
             ratingBarState: context.read<Ratingbarstate>(),
           ),
         ),
-        ChangeNotifierProvider(create: (context) => SurveyDataProvider(orgId: orgId, assessmentID: assessmentId, docId: docId, googleFunctionService: Provider.of<GoogleFunctionService>(context, listen: false))),
-        Provider<GoogleFunctionService>(create: (context) {
-          final surveyDataProvider = Provider.of<SurveyDataProvider>(context, listen: false);
-          return GoogleFunctionService(surveyDataProvider: surveyDataProvider, questionsProvider: Provider.of<QuestionsProvider>(context, listen: false));
-        })
+        ChangeNotifierProvider(create: (context) => SurveyDataProvider(orgId: orgId, assessmentID: assessmentId, docId: docId)),
       ],
       child: MyApp(),
     ));

@@ -58,6 +58,7 @@ class MainComponentLayout extends StatelessWidget {
             );
           },
         ),
+        Padding(padding: EdgeInsetsGeometry.all(20)),
         CustomProgressBar(),
         Flexible(
           child: Consumer<QuestionsProvider>(

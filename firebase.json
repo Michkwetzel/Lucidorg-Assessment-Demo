@@ -13,7 +13,7 @@
   },
   "hosting": {
     "public": "build/web",
-    "site": "assessment-909ce",
+    "site": "assessmentlucidorg",
     "ignore": [
       "firebase.json",
       "**/.*",
