@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:lucid_org/enums.dart';
 import 'package:lucid_org/exceptions.dart';
@@ -12,9 +11,8 @@ class SurveyDataProvider extends ChangeNotifier {
   String? docId;
   String? companyName;
   bool surveyStarted;
-  GoogleFunctionService googleFunctionService;
 
-  SurveyDataProvider({this.orgId, this.assessmentID, this.docId, this.surveyStarted = false, required this.googleFunctionService});
+  SurveyDataProvider({this.orgId, this.assessmentID, this.docId, this.surveyStarted = false});
 
   Future<bool> init() async {
     print("Init");
@@ -39,12 +37,12 @@ class SurveyDataProvider extends ChangeNotifier {
   }
 
   Future<void> checkDataDocStatus() async {
-    bool surveyStartedStatus = await googleFunctionService.checkDataDocStatus();
+    bool surveyStartedStatus = await GoogleFunctionService.checkDataDocStatus(orgId!, assessmentID!, docId!);
     surveyStarted = surveyStartedStatus;
   }
 
   Future<void> getCompanyName() async {
-    companyName = await googleFunctionService.getCompanyName();
+    companyName = await GoogleFunctionService.getCompanyName(orgId!);
     print(companyName);
   }
 
@@ -59,5 +57,12 @@ class SurveyDataProvider extends ChangeNotifier {
 
   void setSurveyStartedTrue() {
     surveyStarted = true;
+  }
+
+  Future<void> startSurvey() async {
+    bool success = await GoogleFunctionService.surveyStarted(orgId!, assessmentID!, docId!, surveyStarted);
+    if (success) {
+      setSurveyStartedTrue();
+    }
   }
 }

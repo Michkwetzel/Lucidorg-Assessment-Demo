@@ -18,7 +18,6 @@ class CustomNextButton extends StatelessWidget {
       double result;
       QuestionsProvider questionsProvider = Provider.of<QuestionsProvider>(context, listen: false);
       SurveyDataProvider surveyDataProvider = Provider.of<SurveyDataProvider>(context, listen: false);
-      GoogleFunctionService googleFunctionService = Provider.of<GoogleFunctionService>(context, listen: false);
 
       // Go to first question
       if (questionsProvider.currentIndex == -1) {
@@ -71,7 +70,12 @@ class CustomNextButton extends StatelessWidget {
                   ),
                 );
               });
-          await Provider.of<GoogleFunctionService>(context, listen: false).saveResults(results).then(
+          await GoogleFunctionService.saveResults(
+            surveyDataProvider.orgId!,
+            surveyDataProvider.assessmentID!,
+            surveyDataProvider.docId!,
+            results
+          ).then(
             (_) {
               Navigator.pop(context);
             },

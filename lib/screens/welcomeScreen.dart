@@ -9,6 +9,8 @@ import 'package:lucid_org/screens/errorScreen.dart';
 import 'package:lucid_org/screens/loading_screen.dart';
 import 'package:lucid_org/screens/mainScreen.dart';
 import 'package:lucid_org/services/googleFunctionService.dart';
+import 'package:lucid_org/helperClasses/questionMultipleChoice.dart';
+import 'package:lucid_org/helperClasses/questionRating.dart';
 import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
 
@@ -34,22 +36,52 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     _initializeScreen();
   }
 
-  // Combined initialization method
+  // Fixed initialization method
   Future<void> _initializeScreen() async {
     if (mounted) {
       setState(() {
         _loadingText = "Loading Survey";
       });
     }
+
     try {
       final surveyDataProvider = Provider.of<SurveyDataProvider>(context, listen: false);
-      final googleFunctionService = Provider.of<GoogleFunctionService>(context, listen: false);
+      final questionsProvider = Provider.of<QuestionsProvider>(context, listen: false);
 
-      // First Check tokens and get current Assssment DocName
+      // First Check tokens and get current Assessment DocName
       await surveyDataProvider.init();
 
       // Get Questions
-      await googleFunctionService.getQuestions();
+      final questionsResponse = await GoogleFunctionService.getQuestions();
+      if (questionsResponse['success']) {
+        // Fix: Properly cast the nested map structure
+        final rawQuestions = questionsResponse['questions'] as Map<String, dynamic>;
+        Map<String, Map<String, dynamic>> multipleChoiceQuestions = rawQuestions.map((key, value) => MapEntry(key, Map<String, dynamic>.from(value as Map)));
+
+        int count = 0;
+
+        multipleChoiceQuestions.forEach((key, value) {
+          count++;
+          questionsProvider.addQuestion(Questionmultiplechoice(
+            textHeading: value['textHeading'] ?? 'Default Text',
+            index: value['index'],
+            type: QuestionType.multipleChoice,
+          ));
+        });
+
+        print("$count Multiple choice Questions loaded into QuestionsProvider.");
+        questionsProvider.sortQuestions();
+        print("getQuestions successful");
+      } else {
+        questionsProvider.setQuestions([
+          QuestionRating(
+            textHeading: "This is awkward",
+            textBody: 'There was an error getting the question. Please refresh the browser',
+            index: 0,
+            type: QuestionType.error,
+          )
+        ]);
+      }
 
       // Done Loading
       if (mounted) {
@@ -165,7 +197,8 @@ class WelcomeScreenComponentLayout extends StatelessWidget {
           );
         },
       );
-      await Provider.of<GoogleFunctionService>(context, listen: false).surveyStarted().then(
+      final surveyDataProvider = Provider.of<SurveyDataProvider>(context, listen: false);
+      await surveyDataProvider.startSurvey().then(
         (value) {
           if (context.mounted) {
             Navigator.pop(context);

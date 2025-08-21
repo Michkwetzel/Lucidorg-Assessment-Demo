@@ -123,7 +123,7 @@ class QuestionsProvider extends ChangeNotifier {
   }
 
   void saveResult(double result) {
-    log.info('Saving result ListIndex: $_currentIndex, Q${currentQuestion.index} Result: $result');
+    log.info('Saving result ListIndex: ${(_currentIndex + 1)}, Q${(currentQuestion.index + 1)} Result: $result');
 
     currentQuestion.result = result;
     currentQuestion.answered = true;
