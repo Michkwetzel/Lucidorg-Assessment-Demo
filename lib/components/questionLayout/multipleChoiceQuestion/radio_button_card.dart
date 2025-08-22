@@ -12,14 +12,8 @@ class RadioButtonCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    EdgeInsetsGeometry padding = const EdgeInsets.only(bottom: 24, left: 32, right: 32);
-
-    if (MediaQuery.of(context).size.width > 600) {
-      padding = const EdgeInsets.only(bottom: 24);
-    }
-
     return Padding(
-      padding: padding,
+      padding: EdgeInsets.only(bottom: 24),
       child: MaterialButton(
         padding: EdgeInsets.symmetric(horizontal: 16, vertical: 22),
         elevation: 0,

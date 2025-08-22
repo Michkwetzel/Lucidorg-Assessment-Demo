@@ -159,7 +159,6 @@ class WelcomeScreenComponentLayout extends StatelessWidget {
                           await onSurveyStarted(context);
                         },
                       ),
-                      // For updating data
                       // CustomStartButton(
                       //   onPressed: () async {
                       //     Provider.of<FirestoreService>(context, listen: false).addQuestiontoDB();
