@@ -17,19 +17,25 @@ class Mainscreen extends StatelessWidget {
       backgroundColor: Colors.white,
       body: Center(
         child: Container(
-          constraints: BoxConstraints(maxWidth: 550),
+          constraints: BoxConstraints(maxWidth: 575),
           child: Stack(
             children: [
               MainComponentLayout(),
               Align(
                 alignment: Alignment.bottomLeft,
-                child: CustomBackButton(
-                  onPressed: () {},
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 20),
+                  child: CustomBackButton(
+                    onPressed: () {},
+                  ),
                 ),
               ),
               Align(
                 alignment: Alignment.bottomRight,
-                child: CustomNextButton(),
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 20),
+                  child: CustomNextButton(),
+                ),
               )
             ],
           ),
@@ -46,28 +52,34 @@ class MainComponentLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Consumer<QuestionsProvider>(
-          builder: (context, questionsProvider, child) {
-            return TopComponent(
-              hasExtraText: questionsProvider.hasExtraText,
-              textExtra: questionsProvider.extraText,
-              questionType: questionsProvider.currentQuestionType,
-            );
-          },
-        ),
-        Padding(padding: EdgeInsetsGeometry.all(20)),
-        CustomProgressBar(),
-        Flexible(
-          child: Consumer<QuestionsProvider>(
+    return Padding(
+      padding: EdgeInsetsGeometry.symmetric(horizontal: 24),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SizedBox(height: 50),
+          Consumer<QuestionsProvider>(
             builder: (context, questionsProvider, child) {
-              return questionsProvider.currentQuestionCard;
+              return TopComponent(
+                text: questionsProvider.textHeading,
+                hasExtraText: questionsProvider.hasExtraText,
+                textExtra: questionsProvider.extraText,
+                questionType: questionsProvider.currentQuestionType,
+              );
             },
           ),
-        )
-      ],
+          SizedBox(height: 24),
+          CustomProgressBar(),
+          SizedBox(height: 15),
+          Flexible(
+            child: Consumer<QuestionsProvider>(
+              builder: (context, questionsProvider, child) {
+                return questionsProvider.currentQuestionCard;
+              },
+            ),
+          )
+        ],
+      ),
     );
   }
 }
