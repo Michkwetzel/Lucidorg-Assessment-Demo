@@ -12,6 +12,7 @@ import 'firebase_options.dart';
 import 'package:logging/logging.dart';
 import 'package:universal_html/html.dart' as html;
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
 
 Future<void> main() async {
   try {
@@ -35,16 +36,22 @@ Future<void> main() async {
     String? docId;
 
     final uri = Uri.parse(html.window.location.href);
+    final token = uri.queryParameters['token'];
 
-    orgId = uri.queryParameters['orgId'];
-    assessmentId = uri.queryParameters['assessmentId'];
-    docId = uri.queryParameters['docId'];
+    if (token == null) {
+      throw MissingTokenException();
+    }
 
-    orgId = 'test';
-    assessmentId = 'test';
-    docId = 'test';
+    try {
+      final decodedToken = JwtDecoder.decode(token);
+      orgId = decodedToken['orgId'];
+      assessmentId = decodedToken['assessmentId'];
+      docId = decodedToken['docId'];
 
-    if (orgId == null || assessmentId == null || docId == null) {
+      if (orgId == null || assessmentId == null || docId == null) {
+        throw MissingTokenException();
+      }
+    } catch (e) {
       throw MissingTokenException();
     }
 

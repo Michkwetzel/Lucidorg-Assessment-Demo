@@ -3,7 +3,7 @@ description: "Organizational efficiency platform"
 
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
-version: 2.1.3
+version: 2.1.4
 
 environment:
   sdk: '>=3.4.3 <4.0.0'
@@ -24,6 +24,7 @@ dependencies:
       ref: main  # Use the branch
   universal_html: ^2.2.4
   http: ^1.3.0
+  jwt_decoder: ^2.0.1
 
 dev_dependencies:
   flutter_test:
