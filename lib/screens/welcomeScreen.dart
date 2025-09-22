@@ -156,7 +156,7 @@ class WelcomeScreenComponentLayout extends StatelessWidget {
                       CustomStartButton(
                         onPressed: () async {
                           log.info('Start Button pressed');
-                          await onSurveyStarted(context);
+                          onSurveyStarted(context);
                         },
                       ),
                       // CustomStartButton(
@@ -175,35 +175,14 @@ class WelcomeScreenComponentLayout extends StatelessWidget {
     );
   }
 
-  Future<void> onSurveyStarted(BuildContext context) async {
+  void onSurveyStarted(BuildContext context) {
     Provider.of<QuestionsProvider>(context, listen: false).nextQuestion();
     Product? product = Provider.of<SurveyDataProvider>(context, listen: false).product;
     if (product == Product.test) {
       Navigator.push(context, MaterialPageRoute(builder: (context) => Mainscreen()));
     } else {
-      showDialog(
-        barrierDismissible: false,
-        barrierColor: Colors.transparent,
-        context: context,
-        builder: (BuildContext context) {
-          return Dialog(
-            backgroundColor: Colors.transparent,
-            child: Center(
-              child: const CircularProgressIndicator(
-                color: Colors.blue,
-              ),
-            ),
-          );
-        },
-      );
       final surveyDataProvider = Provider.of<SurveyDataProvider>(context, listen: false);
-      await surveyDataProvider.startSurvey().then(
-        (value) {
-          if (context.mounted) {
-            Navigator.pop(context);
-          }
-        },
-      );
+      surveyDataProvider.startSurvey();
       Navigator.push(context, MaterialPageRoute(builder: (context) => Mainscreen()));
     }
   }
