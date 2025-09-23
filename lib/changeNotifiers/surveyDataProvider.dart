@@ -50,9 +50,12 @@ class SurveyDataProvider extends ChangeNotifier {
   }
 
   Future<void> startSurvey() async {
-    bool success = await GoogleFunctionService.surveyStarted(orgId!, assessmentID!, docId!, surveyStarted);
-    if (success) {
-      surveyStarted = true;
+    if (!surveyStarted) {
+      bool success = await GoogleFunctionService.surveyStarted(orgId!, assessmentID!, docId!, surveyStarted);
+      if (success) {
+        surveyStarted = true;
+        return;
+      }
     }
   }
 }

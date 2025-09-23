@@ -13,12 +13,11 @@ class CustomBackButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     void previousQuestion() {
-      QuestionsProvider q = Provider.of<QuestionsProvider>(context, listen: false);
-      if (!Provider.of<QuestionsProvider>(context, listen: false).canGoBack) {
-        Provider.of<QuestionsProvider>(context, listen: false).reset();
+      QuestionsProvider questionsProvider = Provider.of<QuestionsProvider>(context, listen: false);
+      if (!questionsProvider.canGoBack) {
         Navigator.pop(context);
       } else {
-        Provider.of<QuestionsProvider>(context, listen: false).previousQuestion();
+        questionsProvider.previousQuestion();
       }
     }
 

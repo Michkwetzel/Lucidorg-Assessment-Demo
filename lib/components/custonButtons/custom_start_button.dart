@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class CustomStartButton extends StatelessWidget {
-  final VoidCallback onPressed;
+  final Future<void> Function() onPressed;
   const CustomStartButton({super.key, required this.onPressed});
 
   @override
@@ -9,7 +9,7 @@ class CustomStartButton extends StatelessWidget {
     return ConstrainedBox(
       constraints: BoxConstraints(maxWidth: 300),
       child: MaterialButton(
-        onPressed: onPressed,
+        onPressed: () async => await onPressed(),
         color: Color(0xFF3F94FF),
         elevation: 4,
         padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),

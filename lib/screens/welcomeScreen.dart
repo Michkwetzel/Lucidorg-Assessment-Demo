@@ -8,7 +8,7 @@ import 'package:lucid_org/exceptions.dart';
 import 'package:lucid_org/screens/errorScreen.dart';
 import 'package:lucid_org/screens/loading_screen.dart';
 import 'package:lucid_org/screens/mainScreen.dart';
-import 'package:lucid_org/services/googleFunctionService.dart';
+import 'package:lucid_org/services/firestoreService.dart';
 import 'package:lucid_org/helperClasses/questionMultipleChoice.dart';
 import 'package:lucid_org/helperClasses/questionRating.dart';
 import 'package:logging/logging.dart';
@@ -52,11 +52,10 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       await surveyDataProvider.init();
 
       // Get Questions
-      final questionsResponse = await GoogleFunctionService.getQuestions();
-      if (questionsResponse['success']) {
+      final questions = await Firestoreservice.getQuestions();
+      if (questions.isNotEmpty) {
         // Fix: Properly cast the nested map structure
-        final rawQuestions = questionsResponse['questions'] as Map<String, dynamic>;
-        Map<String, Map<String, dynamic>> multipleChoiceQuestions = rawQuestions.map((key, value) => MapEntry(key, Map<String, dynamic>.from(value as Map)));
+        Map<String, Map<String, dynamic>> multipleChoiceQuestions = questions.map((key, value) => MapEntry(key, Map<String, dynamic>.from(value as Map)));
 
         int count = 0;
 
@@ -76,7 +75,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         questionsProvider.setQuestions([
           QuestionRating(
             textHeading: "This is awkward",
-            textBody: 'There was an error getting the question. Please refresh the browser',
+            textBody: 'There was an error getting the question. Please click the link again',
             index: 0,
             type: QuestionType.error,
           )
@@ -151,12 +150,12 @@ class WelcomeScreenComponentLayout extends StatelessWidget {
                     children: [
                       Text('Welcome to the Assessment', style: kWelcomeScreenH1TextStyle),
                       SizedBox(height: 8),
-                      Text('Answers are saved anonymously. If you exit before finishing, your result will not be saved', style: kWelcomeScreenH2TextStyle),
+                      Text('The assessment will take approximately 15min. If you exit before finishing, your result will not be saved', style: kWelcomeScreenH2TextStyle),
                       SizedBox(height: 24),
                       CustomStartButton(
                         onPressed: () async {
                           log.info('Start Button pressed');
-                          onSurveyStarted(context);
+                          await onSurveyStarted(context);
                         },
                       ),
                       // CustomStartButton(
@@ -175,90 +174,19 @@ class WelcomeScreenComponentLayout extends StatelessWidget {
     );
   }
 
-  void onSurveyStarted(BuildContext context) {
-    Provider.of<QuestionsProvider>(context, listen: false).nextQuestion();
-    Product? product = Provider.of<SurveyDataProvider>(context, listen: false).product;
-    if (product == Product.test) {
-      Navigator.push(context, MaterialPageRoute(builder: (context) => Mainscreen()));
-    } else {
-      final surveyDataProvider = Provider.of<SurveyDataProvider>(context, listen: false);
-      surveyDataProvider.startSurvey();
-      Navigator.push(context, MaterialPageRoute(builder: (context) => Mainscreen()));
+  Future<void> onSurveyStarted(BuildContext context) async {
+    final surveyDataProvider = Provider.of<SurveyDataProvider>(context, listen: false);
+    final questionsProvider = Provider.of<QuestionsProvider>(context, listen: false);
+
+    if (questionsProvider.currentIndex == -1) {
+      questionsProvider.nextQuestion();
     }
-  }
-}
 
-class LogoSpinAnimation extends StatefulWidget {
-  const LogoSpinAnimation({super.key});
+    Navigator.push(context, MaterialPageRoute(builder: (context) => Mainscreen()));
 
-  @override
-  State<LogoSpinAnimation> createState() => _LogoSpinAnimationState();
-}
-
-class _LogoSpinAnimationState extends State<LogoSpinAnimation> with SingleTickerProviderStateMixin {
-  late final AnimationController _controller;
-  late final Animation<double> _animation;
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      duration: const Duration(seconds: 5), // Total animation duration
-      vsync: this,
-    )..repeat();
-
-    // Create a custom curve for the spinning animation
-    _animation = CurvedAnimation(
-      parent: _controller,
-      curve: Curves.easeInOut,
-    ).drive(
-      Tween<double>(
-        begin: 0,
-        end: 1,
-      ).chain(
-        TweenSequence([
-          TweenSequenceItem(
-            tween: Tween<double>(begin: 0, end: 2) // Fast clockwise spin (2 rotations)
-                .chain(CurveTween(curve: Curves.easeOut)),
-            weight: 40,
-          ),
-          TweenSequenceItem(
-            tween: Tween<double>(begin: 2, end: 1.5) // Slower counterclockwise (half rotation back)
-                .chain(CurveTween(curve: Curves.easeInOut)),
-            weight: 60,
-          ),
-        ]),
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return TextButton(
-        onPressed: () {
-          showDialog(
-            barrierDismissible: false,
-            barrierColor: Colors.transparent,
-            context: context,
-            builder: (BuildContext context) {
-              return Dialog(
-                backgroundColor: Colors.transparent,
-                child: Center(
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.all(Radius.circular(20)),
-                    child: RotationTransition(
-                      turns: _animation,
-                      child: Image.asset(
-                        'assets/logo/3transparent_logo.png',
-                        width: 100,
-                        height: 100,
-                      ),
-                    ),
-                  ),
-                ),
-              );
-            },
-          );
-        },
-        child: Text("data"));
+    // Perform heavy operations after navigation using natural async/await
+    if (surveyDataProvider.product != Product.test && !surveyDataProvider.surveyStarted) {
+      await surveyDataProvider.startSurvey();
+    }
   }
 }
