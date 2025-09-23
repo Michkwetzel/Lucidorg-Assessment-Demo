@@ -59,23 +59,40 @@ class CustomNextButton extends StatelessWidget {
         } else {
           final results = questionsProvider.getResults();
           showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                return Dialog(
-                  backgroundColor: Colors.transparent,
-                  child: Center(
-                    child: const CircularProgressIndicator(
-                      color: Colors.blue,
-                    ),
+            context: context,
+            barrierColor: Colors.transparent, // This removes the dark overlay
+            builder: (BuildContext context) {
+              return Dialog(
+                backgroundColor: Colors.transparent,
+                child: Center(
+                  child: Column(
+                    spacing: 12,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const CircularProgressIndicator(
+                        backgroundColor: Colors.transparent,
+                        color: Colors.blue,
+                      ),
+                      Container(
+                        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.20), blurRadius: 4)],
+                        ),
+                        child: Text(
+                          "Saving results",
+                          style: Theme.of(context).textTheme.bodyLarge,
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ],
                   ),
-                );
-              });
-          await GoogleFunctionService.saveResults(
-            surveyDataProvider.orgId!,
-            surveyDataProvider.assessmentID!,
-            surveyDataProvider.docId!,
-            results
-          ).then(
+                ),
+              );
+            },
+          );
+          await GoogleFunctionService.saveResults(surveyDataProvider.orgId!, surveyDataProvider.assessmentID!, surveyDataProvider.docId!, results).then(
             (_) {
               Navigator.pop(context);
             },
@@ -112,12 +129,10 @@ class CustomNextButton extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Consumer<QuestionsProvider>(
-              builder: (context, questionsProvider, child) {
-                String buttonText = "Next";
-                if (!questionsProvider.canGoForward) {
-                  buttonText = "Submit";
-                }
+            Selector<QuestionsProvider, bool>(
+              selector: (context, provider) => provider.canGoForward,
+              builder: (context, canGoForward, child) {
+                String buttonText = canGoForward ? "Next" : "Submit";
                 return Text(
                   buttonText,
                   style: TextStyle(color: Colors.white, fontFamily: 'Noto Sans', fontSize: 22 * 0.9),

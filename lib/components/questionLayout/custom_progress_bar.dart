@@ -8,12 +8,16 @@ class CustomProgressBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<QuestionsProvider>(
-      builder: (context, questionsProvider, child) {
+    return Selector<QuestionsProvider, ({double progress, String progressText})>(
+      selector: (context, provider) => (
+        progress: (provider.currentIndex + 1) / provider.questionLength,
+        progressText: "${provider.currentIndex + 1} / ${provider.questionLength}",
+      ),
+      builder: (context, data, child) {
         return Row(children: [
           Expanded(
             child: LinearProgressIndicator(
-              value: (questionsProvider.currentIndex + 1) / questionsProvider.questionLength,
+              value: data.progress,
               backgroundColor: Color(0xffDADADA),
               color: Color(0xff1FB707),
             ),
@@ -22,7 +26,7 @@ class CustomProgressBar extends StatelessWidget {
             width: 8,
           ),
           Text(
-            "${questionsProvider.currentIndex + 1} / ${questionsProvider.questionLength}",
+            data.progressText,
             style: kRatingBarHintTextStyle,
           ),
         ]);

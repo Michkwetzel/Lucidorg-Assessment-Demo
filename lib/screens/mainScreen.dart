@@ -4,6 +4,7 @@ import 'package:lucid_org/components/custonButtons/custom_back_button.dart';
 import 'package:lucid_org/components/custonButtons/custom_next_button.dart';
 import 'package:lucid_org/components/questionLayout/custom_progress_bar.dart';
 import 'package:lucid_org/components/questionLayout/top_component.dart';
+import 'package:lucid_org/enums.dart';
 import 'package:provider/provider.dart';
 
 class Mainscreen extends StatelessWidget {
@@ -58,13 +59,19 @@ class MainComponentLayout extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           SizedBox(height: 50),
-          Consumer<QuestionsProvider>(
-            builder: (context, questionsProvider, child) {
+          Selector<QuestionsProvider, ({String textHeading, bool hasExtraText, String extraText, QuestionType questionType})>(
+            selector: (context, provider) => (
+              textHeading: provider.textHeading,
+              hasExtraText: provider.hasExtraText,
+              extraText: provider.extraText,
+              questionType: provider.currentQuestionType,
+            ),
+            builder: (context, data, child) {
               return TopComponent(
-                text: questionsProvider.textHeading,
-                hasExtraText: questionsProvider.hasExtraText,
-                textExtra: questionsProvider.extraText,
-                questionType: questionsProvider.currentQuestionType,
+                text: data.textHeading,
+                hasExtraText: data.hasExtraText,
+                textExtra: data.extraText,
+                questionType: data.questionType,
               );
             },
           ),
@@ -72,9 +79,10 @@ class MainComponentLayout extends StatelessWidget {
           CustomProgressBar(),
           SizedBox(height: 15),
           Flexible(
-            child: Consumer<QuestionsProvider>(
-              builder: (context, questionsProvider, child) {
-                return questionsProvider.currentQuestionCard;
+            child: Selector<QuestionsProvider, Widget>(
+              selector: (context, provider) => provider.currentQuestionCard,
+              builder: (context, currentQuestionCard, child) {
+                return currentQuestionCard;
               },
             ),
           )

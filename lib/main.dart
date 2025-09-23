@@ -6,6 +6,7 @@ import 'package:lucid_org/changeNotifiers/ratingBarState.dart';
 import 'package:lucid_org/exceptions.dart';
 import 'package:lucid_org/screens/errorScreen.dart';
 import 'package:lucid_org/screens/welcomeScreen.dart';
+import 'package:lucid_org/services/firestoreService.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
@@ -31,12 +32,15 @@ Future<void> main() async {
     );
 
     initializeLogging();
+    Firestoreservice.initialize();
     String? orgId;
     String? assessmentId;
     String? docId;
 
     final uri = Uri.parse(html.window.location.href);
-    final token = uri.queryParameters['token'];
+    // final token = uri.queryParameters['token'];
+    final token =
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJvcmdJZCI6IkVIbG9oWlVIZjRXN0RiZHllTTMxIiwiYXNzZXNzbWVudElkIjoiUVMzSmNmMks1QXNOd2xvd2VWbzciLCJkb2NJZCI6Ik5nSVNjT0JjQTg2QjZPd2Q4N0lBIiwiZXhwIjoxNzU4OTc5NDMzLCJpYXQiOjE3NTg1NDc0MzN9.5nYjDpySIWIMbtc2NAe1J0CmK1gk5k95r37x083tDFc/1/0110019971985bba-c752e675-2ba9-4129-883e-9e84fb52f81b-000000/rQaIxO43EMuHhWXkFjuu5_zX09E=229';
 
     if (token == null) {
       throw MissingTokenException();
@@ -48,8 +52,12 @@ Future<void> main() async {
       assessmentId = decodedToken['assessmentId'];
       docId = decodedToken['docId'];
 
+      print('orgId: $orgId');
+      print('assessmentId: $assessmentId');
+      print('docId: $docId');
+
       if (orgId == null || assessmentId == null || docId == null) {
-        throw MissingTokenException();
+        throw InvalidSurveyTokenException();
       }
     } catch (e) {
       throw MissingTokenException();

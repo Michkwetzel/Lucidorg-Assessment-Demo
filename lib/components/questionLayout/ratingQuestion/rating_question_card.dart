@@ -30,7 +30,7 @@ class RatingQuestionCard extends StatelessWidget {
             ],
           ),
         ),
-        CustomRatingBar(key: Provider.of<Ratingbarstate>(context).ratingBarKey),
+        const CustomRatingBar(),
       ],
     );
   }

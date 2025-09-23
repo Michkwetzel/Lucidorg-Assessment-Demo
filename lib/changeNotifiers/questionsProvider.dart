@@ -86,14 +86,25 @@ class QuestionsProvider extends ChangeNotifier {
     }
 
     final currentQuestion = _questions[index];
+    bool needsNotify = false;
 
     try {
       if (currentQuestion is Questionmultiplechoice) {
-        _textHeading = currentQuestion.textHeading;
-        _currentQuestionCard = MultipleChoiceQuestionCard(
+        if (_textHeading != currentQuestion.textHeading) {
+          _textHeading = currentQuestion.textHeading;
+          needsNotify = true;
+        }
+
+        final newCard = MultipleChoiceQuestionCard(
           textHeading: currentQuestion.textHeading,
           options: currentQuestion.options,
         );
+
+        if (_currentQuestionCard != newCard) {
+          _currentQuestionCard = newCard;
+          needsNotify = true;
+        }
+
         if (currentQuestion.answered) {
           _radioInitialState = currentQuestion.result.toInt();
           radioButtonState.onRadioButtonSelected(currentQuestion.result.toInt());
@@ -102,11 +113,20 @@ class QuestionsProvider extends ChangeNotifier {
           radioButtonState.onRadioButtonSelected(-1);
         }
       } else if (currentQuestion is QuestionRating) {
-        _textHeading = currentQuestion.textHeading;
-        _currentQuestionCard = RatingQuestionCard(questionBody: currentQuestion.textBody, hasExtraText: hasExtraText, extraText: extraText);
+        if (_textHeading != currentQuestion.textHeading) {
+          _textHeading = currentQuestion.textHeading;
+          needsNotify = true;
+        }
+
+        final newCard = RatingQuestionCard(questionBody: currentQuestion.textBody, hasExtraText: hasExtraText, extraText: extraText);
+
+        if (_currentQuestionCard != newCard) {
+          _currentQuestionCard = newCard;
+          needsNotify = true;
+        }
+
         if (currentQuestion.answered) {
           _ratingInitialState = currentQuestion.result;
-
           ratingBarState.setInitalRating(currentQuestion.result);
           ratingBarState.setRating(currentQuestion.result);
         } else {
@@ -116,7 +136,10 @@ class QuestionsProvider extends ChangeNotifier {
       } else {
         throw UnsupportedError('Unknown question type: ${currentQuestion.runtimeType}');
       }
-      notifyListeners();
+
+      if (needsNotify) {
+        notifyListeners();
+      }
     } on Exception catch (e) {
       log.severe('Error setting question card: $e');
     }
@@ -158,9 +181,7 @@ class QuestionsProvider extends ChangeNotifier {
 
   void reset() {
     //_questions.clear();
-    _textHeading = '';
     _currentIndex = -1;
-    _currentQuestionCard = const Placeholder();
     //notifyListeners();
   }
 }
