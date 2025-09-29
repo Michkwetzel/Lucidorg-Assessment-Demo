@@ -107,8 +107,8 @@ const String kGetCompanyNamePath = 'https://us-central1-efficiency-1st.cloudfunc
 // const String kGetQuestionsPath = 'http://127.0.0.1:5001/efficiency-1st/us-central1/getQuestions';
 const String kGetQuestionsPath = 'https://us-central1-efficiency-1st.cloudfunctions.net/getQuestionsV2';
 
-// const String kSaveResultsPath = 'http://127.0.0.1:5001/efficiency-1st/us-central1/saveResults';
+// const String kSaveResultsPath = 'http://127.0.0.1:5001/efficiency-1st/us-central1/saveResultsV2';
 const String kSaveResultsPath = 'https://us-central1-efficiency-1st.cloudfunctions.net/saveResultsV2';
 
-// const String kSurveyStartedPath = 'http://127.0.0.1:5001/efficiency-1st/us-central1/surveyStarted';
+// const String kSurveyStartedPath = 'http://127.0.0.1:5001/efficiency-1st/us-central1/surveyStartedV2';
 const String kSurveyStartedPath = 'https://us-central1-efficiency-1st.cloudfunctions.net/surveyStartedV2';
