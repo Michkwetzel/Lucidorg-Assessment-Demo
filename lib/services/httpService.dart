@@ -40,9 +40,14 @@ class HttpService {
 
   static Future<dynamic> postRequest({required String path, required Map<String, dynamic> request, Map<String, String>? additionalHeaders}) async {
     final uri = Uri.parse(path);
-    final headers = {
+    final headers = <String, String>{
       'Content-Type': 'application/json',
     };
+
+    // Add additional headers if provided
+    if (additionalHeaders != null) {
+      headers.addAll(additionalHeaders);
+    }
 
     try {
       logger.info("POST Request: URL=$uri, Body=${jsonEncode(request)} Headers=${headers.toString()}");
