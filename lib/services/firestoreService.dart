@@ -23,7 +23,7 @@ class Firestoreservice {
     if (docRef.exists && docRef.data() != null) {
       return docRef.data()!;
     } else {
-      throw InvalidSurveyTokenException;
+      throw InvalidSurveyTokenException();
     }
   }
 

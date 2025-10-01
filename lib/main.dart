@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:lucid_org/changeNotifiers/surveyDataProvider.dart';
 import 'package:lucid_org/changeNotifiers/questionsProvider.dart';
 import 'package:lucid_org/changeNotifiers/radioButtonsState.dart';
-import 'package:lucid_org/changeNotifiers/ratingBarState.dart';
 import 'package:lucid_org/exceptions.dart';
 import 'package:lucid_org/screens/errorScreen.dart';
 import 'package:lucid_org/screens/welcomeScreen.dart';
@@ -39,21 +38,25 @@ Future<void> main() async {
     String? docId;
 
     final uri = Uri.parse(html.window.location.href);
-    final token = uri.queryParameters['token'];
-
+    // final token = uri.queryParameters['token'];
+    final token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJvcmdJZCI6IkVIbG9oWlVIZjRXN0RiZHllTTMxIiwiYXNzZXNzbWVudElkIjoiUVMzSmNmMks1QXNOd2xvd2VWbzciLCJkb2NJZCI6ImxBMFhWbTNpaTNXWGs4a1NVM2dVIiwiZXhwIjoxNzYwMTk1MTQzLCJpYXQiOjE3NTkzMzExNDN9.E__KR5O0vmBKwGz8O5W-rryGVOCEMiDHGFz8TUsjq_M";
+    
     if (token == null) {
       throw MissingTokenException();
     }
 
     try {
-      // // Store the JWT token in AuthService for API requests
       print("assessment v2.1.1");
-      AuthService.setJwtToken(token);
+
+      // Check if token is expired
+      if (JwtDecoder.isExpired(token)) {
+        throw InvalidSurveyTokenException();
+      }
 
       final decodedToken = JwtDecoder.decode(token);
-      orgId = decodedToken['orgId'];
-      assessmentId = decodedToken['assessmentId'];
-      docId = decodedToken['docId'];
+      orgId = decodedToken['orgId'] as String?;
+      assessmentId = decodedToken['assessmentId'] as String?;
+      docId = decodedToken['docId'] as String?;
 
       // orgId = 'test';
       // assessmentId = 'test';
@@ -63,21 +66,29 @@ Future<void> main() async {
       print('assessmentId: $assessmentId');
       print('docId: $docId');
 
-      if (orgId == null || assessmentId == null || docId == null) {
+      if (orgId == null || orgId.isEmpty ||
+          assessmentId == null || assessmentId.isEmpty ||
+          docId == null || docId.isEmpty) {
         throw InvalidSurveyTokenException();
       }
+
+      // Store the JWT token in AuthService for API requests after validation
+      AuthService.setJwtToken(token);
+    } on FormatException {
+      throw InvalidSurveyTokenException();
     } catch (e) {
+      if (e is InvalidSurveyTokenException) {
+        rethrow;
+      }
       throw MissingTokenException();
     }
 
     runApp(MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => RadioButtonState()),
-        ChangeNotifierProvider(create: (context) => Ratingbarstate()),
         ChangeNotifierProvider(
           create: (context) => QuestionsProvider(
             radioButtonState: context.read<RadioButtonState>(),
-            ratingBarState: context.read<Ratingbarstate>(),
           ),
         ),
         ChangeNotifierProvider(create: (context) => SurveyDataProvider(orgId: orgId, assessmentID: assessmentId, docId: docId)),
