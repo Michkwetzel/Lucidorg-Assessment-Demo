@@ -47,6 +47,7 @@ Future<void> main() async {
 
     try {
       // // Store the JWT token in AuthService for API requests
+      print("assessment v2.1.1");
       AuthService.setJwtToken(token);
 
       final decodedToken = JwtDecoder.decode(token);
