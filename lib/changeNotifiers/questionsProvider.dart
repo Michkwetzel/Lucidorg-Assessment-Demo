@@ -1,33 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:lucid_org/changeNotifiers/radioButtonsState.dart';
-import 'package:lucid_org/changeNotifiers/ratingBarState.dart';
 import 'package:lucid_org/components/questionLayout/multipleChoiceQuestion/multiple_choice_question_card.dart';
-import 'package:lucid_org/components/questionLayout/ratingQuestion/rating_question_card.dart';
 import 'package:lucid_org/enums.dart';
 import 'package:lucid_org/helperClasses/questionBase.dart';
 import 'package:lucid_org/helperClasses/questionMultipleChoice.dart';
-import 'package:lucid_org/helperClasses/questionRating.dart';
 import 'package:logging/logging.dart';
 
 class QuestionsProvider extends ChangeNotifier {
   final Logger log = Logger('QuestionsProvider');
-  Ratingbarstate ratingBarState;
   RadioButtonState radioButtonState;
 
-  QuestionsProvider({required this.ratingBarState, required this.radioButtonState});
+  QuestionsProvider({required this.radioButtonState});
 
   // Private fields
   List<QuestionBase> _questions = [];
   String _textHeading = '';
   int _currentIndex = -1; //Start at -1 because on first start click needs to load index = 0
-  double _ratingInitialState = -1;
   int _radioInitialState = -1;
   Widget _currentQuestionCard = const Placeholder();
 
   // Getters
   Widget get currentQuestionCard => _currentQuestionCard;
   String get textHeading => _textHeading;
-  double get ratingInitialState => _ratingInitialState;
   int get radioInitialState => _radioInitialState;
   int get questionLength => _questions.length;
   int get currentIndex => _currentIndex;
@@ -89,6 +83,7 @@ class QuestionsProvider extends ChangeNotifier {
     bool needsNotify = false;
 
     try {
+      // All questions are multiple choice now
       if (currentQuestion is Questionmultiplechoice) {
         if (_textHeading != currentQuestion.textHeading) {
           _textHeading = currentQuestion.textHeading;
@@ -111,27 +106,6 @@ class QuestionsProvider extends ChangeNotifier {
         } else {
           _radioInitialState = -1;
           radioButtonState.onRadioButtonSelected(-1);
-        }
-      } else if (currentQuestion is QuestionRating) {
-        if (_textHeading != currentQuestion.textHeading) {
-          _textHeading = currentQuestion.textHeading;
-          needsNotify = true;
-        }
-
-        final newCard = RatingQuestionCard(questionBody: currentQuestion.textBody, hasExtraText: hasExtraText, extraText: extraText);
-
-        if (_currentQuestionCard != newCard) {
-          _currentQuestionCard = newCard;
-          needsNotify = true;
-        }
-
-        if (currentQuestion.answered) {
-          _ratingInitialState = currentQuestion.result;
-          ratingBarState.setInitalRating(currentQuestion.result);
-          ratingBarState.setRating(currentQuestion.result);
-        } else {
-          _ratingInitialState = -1;
-          ratingBarState.setRating(-1);
         }
       } else {
         throw UnsupportedError('Unknown question type: ${currentQuestion.runtimeType}');
@@ -167,7 +141,6 @@ class QuestionsProvider extends ChangeNotifier {
     }
 
     _currentIndex--;
-    ratingBarState.resetRating();
     setCurrentQuestionCard(_currentIndex);
   }
 
