@@ -1,21 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:lucid_org/changeNotifiers/questionsProvider.dart';
 import 'package:lucid_org/changeNotifiers/radioButtonsState.dart';
-import 'package:lucid_org/changeNotifiers/ratingBarState.dart';
 import 'package:lucid_org/changeNotifiers/surveyDataProvider.dart';
 import 'package:lucid_org/enums.dart';
-import 'package:lucid_org/helperClasses/questionMultipleChoice.dart';
 import 'package:lucid_org/screens/finalScreen.dart';
 import 'package:lucid_org/services/googleFunctionService.dart';
 import 'package:provider/provider.dart';
+import 'package:logging/logging.dart';
 
-class CustomNextButton extends StatelessWidget {
+class CustomNextButton extends StatefulWidget {
   const CustomNextButton({super.key});
+
+  @override
+  State<CustomNextButton> createState() => _CustomNextButtonState();
+}
+
+class _CustomNextButtonState extends State<CustomNextButton> {
+  static final Logger logger = Logger('CustomNextButton');
 
   @override
   Widget build(BuildContext context) {
     void nextQuestion() async {
-      double result;
       QuestionsProvider questionsProvider = Provider.of<QuestionsProvider>(context, listen: false);
       SurveyDataProvider surveyDataProvider = Provider.of<SurveyDataProvider>(context, listen: false);
 
@@ -25,22 +30,14 @@ class CustomNextButton extends StatelessWidget {
         return;
       }
 
-      // Get selected answer
-      if (questionsProvider.currentQuestion is Questionmultiplechoice) {
-        result = Provider.of<RadioButtonState>(context, listen: false).selectedIndex.toDouble();
-        if (result == -1) {
-          //No answer selected
-          Provider.of<RadioButtonState>(context, listen: false).noAnswerSelected();
-          return;
-        }
-      } else {
+      // Get selected answer (all questions are multiple choice now)
+      double result = Provider.of<RadioButtonState>(context, listen: false).selectedIndex.toDouble();
+      if (result == -1) {
         //No answer selected
-        result = Provider.of<Ratingbarstate>(context, listen: false).getRating();
-        if (result == -1) {
-          Provider.of<Ratingbarstate>(context, listen: false).noAnswerSelected();
-          return;
-        }
+        Provider.of<RadioButtonState>(context, listen: false).noAnswerSelected();
+        return;
       }
+
       questionsProvider.saveResult(result);
 
       if (questionsProvider.currentIndex < questionsProvider.questionLength - 1) {
@@ -58,9 +55,15 @@ class CustomNextButton extends StatelessWidget {
           );
         } else {
           final results = questionsProvider.getResults();
+
+          // Create a ValueNotifier to track retry status
+          final retryStatus = ValueNotifier<String>("Saving results");
+
+          // Show loading dialog
           showDialog(
             context: context,
-            barrierColor: Colors.transparent, // This removes the dark overlay
+            barrierDismissible: false,
+            barrierColor: Colors.transparent,
             builder: (BuildContext context) {
               return Dialog(
                 backgroundColor: Colors.transparent,
@@ -73,18 +76,23 @@ class CustomNextButton extends StatelessWidget {
                         backgroundColor: Colors.transparent,
                         color: Colors.blue,
                       ),
-                      Container(
-                        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(12),
-                          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.20), blurRadius: 4)],
-                        ),
-                        child: Text(
-                          "Saving results",
-                          style: Theme.of(context).textTheme.bodyLarge,
-                          textAlign: TextAlign.center,
-                        ),
+                      ValueListenableBuilder<String>(
+                        valueListenable: retryStatus,
+                        builder: (context, status, child) {
+                          return Container(
+                            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.20), blurRadius: 4)],
+                            ),
+                            child: Text(
+                              status,
+                              style: Theme.of(context).textTheme.bodyLarge,
+                              textAlign: TextAlign.center,
+                            ),
+                          );
+                        },
                       ),
                     ],
                   ),
@@ -92,21 +100,57 @@ class CustomNextButton extends StatelessWidget {
               );
             },
           );
-          await GoogleFunctionService.saveResults(surveyDataProvider.orgId!, surveyDataProvider.assessmentID!, surveyDataProvider.docId!, results).then(
-            (_) {
-              Navigator.pop(context);
-            },
-          );
-        }
-        try {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const FinalScreen(),
-            ),
-          );
-        } catch (e) {
-          print('Navigation error: $e');
+
+          try {
+            await GoogleFunctionService.saveResults(
+              surveyDataProvider.orgId!,
+              surveyDataProvider.assessmentID!,
+              surveyDataProvider.docId!,
+              results,
+              onRetry: (attempt) {
+                retryStatus.value = "Retrying... (Attempt $attempt)";
+              },
+            );
+
+            // Check if widget is still mounted before using context
+            if (!mounted) return;
+
+            // Pop dialog
+            Navigator.pop(context);
+
+            // Navigate to final screen
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const FinalScreen(),
+              ),
+            );
+          } catch (e) {
+            logger.severe('Error saving results: $e');
+
+            if (!mounted) return;
+
+            // Pop loading dialog
+            Navigator.pop(context);
+
+            // Show error dialog
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: const Text('Connection Error'),
+                  content: const Text('Unable to save your results after multiple attempts. Please wait a few seconds and try submitting again by pressing the Submit button.'),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text('OK'),
+                    ),
+                  ],
+                );
+              },
+            );
+          }
+          return;
         }
       }
       //Provider.of<QuestionsProvider>(context, listen: false).printQuestions();

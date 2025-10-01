@@ -60,7 +60,7 @@ class HttpService {
       throw HttpRequestException('Network error: Unable to connect to server. Details: ${e.message}');
     } catch (e) {
       logger.severe('Unexpected error: ${e.toString()}');
-      //throw HttpRequestException(e.toString());
+      throw HttpRequestException(e.toString());
     }
   }
 

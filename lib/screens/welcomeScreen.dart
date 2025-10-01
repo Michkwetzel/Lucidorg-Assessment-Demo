@@ -10,7 +10,6 @@ import 'package:lucid_org/screens/loading_screen.dart';
 import 'package:lucid_org/screens/mainScreen.dart';
 import 'package:lucid_org/services/firestoreService.dart';
 import 'package:lucid_org/helperClasses/questionMultipleChoice.dart';
-import 'package:lucid_org/helperClasses/questionRating.dart';
 import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
 
@@ -68,18 +67,14 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
           ));
         });
 
-        print("$count Multiple choice Questions loaded into QuestionsProvider.");
+        logger.info("$count Multiple choice Questions loaded into QuestionsProvider.");
         questionsProvider.sortQuestions();
-        print("getQuestions successful");
+        logger.info("getQuestions successful");
       } else {
-        questionsProvider.setQuestions([
-          QuestionRating(
-            textHeading: "This is awkward",
-            textBody: 'There was an error getting the question. Please click the link again',
-            index: 0,
-            type: QuestionType.error,
-          )
-        ]);
+        throw SurveyException(
+          'There was an error getting the questions. Please click the link again',
+          'Configuration Error'
+        );
       }
 
       // Done Loading

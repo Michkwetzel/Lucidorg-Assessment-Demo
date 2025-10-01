@@ -7,44 +7,76 @@ import 'package:logging/logging.dart';
 class GoogleFunctionService {
   static Logger logger = Logger('GoogleFunctionService');
 
-  static Future<bool> surveyStarted(String orgId, String assessmentId, String docId, bool alreadyStarted) async {
+  static Future<bool> surveyStarted(String orgId, String assessmentId, String docId, bool alreadyStarted, {int maxRetries = 3}) async {
     // Survey Already started. No Need to do call to back end.
     if (alreadyStarted) {
       logger.info('Already started');
       return true;
     }
 
-    try {
-      Map<String, String> request = {};
+    int attempt = 0;
 
-      final response = await HttpService.postRequest(path: kSurveyStartedPath, request: request, additionalHeaders: AuthService.getAuthHeaders());
+    while (attempt < maxRetries) {
+      try {
+        Map<String, String> request = {};
 
-      if (response['success']) {
-        logger.info('Survey Started for company: $orgId, docId: $docId');
-        return true;
-      } else {
-        throw Exception(response['error'] ?? 'Failed to start survey');
+        final response = await HttpService.postRequest(path: kSurveyStartedPath, request: request, additionalHeaders: AuthService.getAuthHeaders());
+
+        if (response['success']) {
+          logger.info('Survey Started for company: $orgId, docId: $docId');
+          return true;
+        } else {
+          throw Exception(response['error'] ?? 'Failed to start survey');
+        }
+      } catch (e) {
+        attempt++;
+        logger.warning('Error starting survey (attempt $attempt/$maxRetries): $e');
+
+        if (attempt >= maxRetries) {
+          logger.severe('Failed to start survey after $maxRetries attempts');
+          rethrow;
+        }
+
+        // Exponential backoff: 2s, 4s...
+        await Future.delayed(Duration(seconds: 2 * attempt));
       }
-    } catch (e) {
-      logger.severe('Error starting survey: $e');
-      rethrow;
     }
+
+    return false;
   }
 
-  static Future<void> saveResults(String orgId, String assessmentId, String docId, List<int> results) async {
-    try {
-      Map<String, dynamic> request = {'results': results};
+  static Future<void> saveResults(String orgId, String assessmentId, String docId, List<int> results, {Function(int)? onRetry, int maxRetries = 3}) async {
+    int attempt = 0;
 
-      final response = await HttpService.postRequest(path: kSaveResultsPath, request: request, additionalHeaders: AuthService.getAuthHeaders());
+    while (attempt < maxRetries) {
+      try {
+        Map<String, dynamic> request = {'results': results};
 
-      if (response['success']) {
-        logger.info('Results saved successfully for docId: $docId');
-      } else {
-        throw Exception(response['error'] ?? 'Failed to save results');
+        final response = await HttpService.postRequest(path: kSaveResultsPath, request: request, additionalHeaders: AuthService.getAuthHeaders());
+
+        if (response['success']) {
+          logger.info('Results saved successfully for docId: $docId');
+          return;
+        } else {
+          throw Exception(response['error'] ?? 'Failed to save results');
+        }
+      } catch (e) {
+        attempt++;
+        logger.warning('Error saving results (attempt $attempt/$maxRetries): $e');
+
+        if (attempt >= maxRetries) {
+          logger.severe('Failed to save results after $maxRetries attempts');
+          rethrow;
+        }
+
+        // Notify caller about retry attempt
+        if (onRetry != null) {
+          onRetry(attempt);
+        }
+
+        // Exponential backoff: 2s, 4s, 8s...
+        await Future.delayed(Duration(seconds: 2 * attempt));
       }
-    } catch (e) {
-      logger.severe('Error saving results: $e');
-      rethrow;
     }
   }
 
