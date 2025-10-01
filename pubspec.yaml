@@ -3,7 +3,7 @@ description: "Organizational efficiency platform"
 
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
-version: 2.2.0
+version: 2.2.1
 
 environment:
   sdk: '>=3.4.3 <4.0.0'
