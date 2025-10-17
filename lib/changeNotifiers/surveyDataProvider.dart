@@ -19,7 +19,7 @@ class SurveyDataProvider extends ChangeNotifier {
   SurveyDataProvider({this.orgId, this.assessmentID, this.docId, this.surveyStarted = false});
 
   Future<bool> init() async {
-    print("Init");
+    logger.info("Initializing SurveyDataProvider");
     try {
       if (orgId == 'test') {
         product = Product.test;
@@ -33,7 +33,7 @@ class SurveyDataProvider extends ChangeNotifier {
       surveyStarted = surveyData['started'];
       companyName = surveyData['companyName'];
 
-      printAllAttributes();
+      logAllAttributes();
       return true;
     } on Exception catch (e) {
       if (e is SurveyException) {
@@ -43,13 +43,8 @@ class SurveyDataProvider extends ChangeNotifier {
     }
   }
 
-  void printAllAttributes() {
-    print('orgId: $orgId');
-    print('assessmentID: $assessmentID');
-    print('docId: $docId');
-    print('product: $product');
-    print('companyName: $companyName');
-    print('surveyStarted: $surveyStarted');
+  void logAllAttributes() {
+    logger.info('Survey data - orgId: $orgId, assessmentID: $assessmentID, docId: $docId, product: $product, companyName: $companyName, surveyStarted: $surveyStarted');
   }
 
   Future<void> startSurvey() async {
