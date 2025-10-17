@@ -12,6 +12,10 @@ class MissingTokenException extends SurveyException {
   MissingTokenException() : super('Required tokens are missing from the URL', 'Invalid URL');
 }
 
+class Error extends SurveyException {
+  Error() : super('Problem starting survey', 'Problem starting survey');
+}
+
 class CompanyNotFoundException extends SurveyException {
   CompanyNotFoundException() : super('Incorrect Assessment link. Survey', 'Invalid Company');
 }

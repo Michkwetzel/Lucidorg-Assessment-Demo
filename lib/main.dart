@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:lucid_org/changeNotifiers/surveyDataProvider.dart';
 import 'package:lucid_org/changeNotifiers/questionsProvider.dart';
 import 'package:lucid_org/changeNotifiers/radioButtonsState.dart';
+import 'package:lucid_org/changeNotifiers/welcome_screen_provider.dart';
 import 'package:lucid_org/exceptions.dart';
 import 'package:lucid_org/screens/errorScreen.dart';
 import 'package:lucid_org/screens/welcomeScreen.dart';
 import 'package:lucid_org/services/firestoreService.dart';
 import 'package:lucid_org/services/authService.dart';
+import 'package:lucid_org/utils/app_logger.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
@@ -17,12 +19,7 @@ import 'package:jwt_decoder/jwt_decoder.dart';
 
 Future<void> main() async {
   try {
-    void initializeLogging() {
-      Logger.root.level = Level.ALL;
-      Logger.root.onRecord.listen((record) {
-        print('${record.level.name}: ${record.loggerName}: ${record.time}: ${record.message}');
-      });
-    }
+    final logger = AppLogger.getLogger('Main');
 
     WidgetsFlutterBinding.ensureInitialized();
     setUrlStrategy(PathUrlStrategy());
@@ -31,7 +28,7 @@ Future<void> main() async {
       options: DefaultFirebaseOptions.currentPlatform,
     );
 
-    initializeLogging();
+    AppLogger.initialize();
     Firestoreservice.initialize();
     String? orgId;
     String? assessmentId;
@@ -39,32 +36,29 @@ Future<void> main() async {
 
     final uri = Uri.parse(html.window.location.href);
     // final token = uri.queryParameters['token'];
-    final token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJvcmdJZCI6IkVIbG9oWlVIZjRXN0RiZHllTTMxIiwiYXNzZXNzbWVudElkIjoiUVMzSmNmMks1QXNOd2xvd2VWbzciLCJkb2NJZCI6ImxBMFhWbTNpaTNXWGs4a1NVM2dVIiwiZXhwIjoxNzYwMTk1MTQzLCJpYXQiOjE3NTkzMzExNDN9.E__KR5O0vmBKwGz8O5W-rryGVOCEMiDHGFz8TUsjq_M";
-    
-    if (token == null) {
-      throw MissingTokenException();
-    }
+    // Token Example:
+    // final token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJvcmdJZCI6IkVIbG9oWlVIZjRXN0RiZHllTTMxIiwiYXNzZXNzbWVudElkIjoiUVMzSmNmMks1QXNOd2xvd2VWbzciLCJkb2NJZCI6ImxBMFhWbTNpaTNXWGs4a1NVM2dVIiwiZXhwIjoxNzYwMTk1MTQzLCJpYXQiOjE3NTkzMzExNDN9.E__KR5O0vmBKwGz8O5W-rryGVOCEMiDHGFz8TUsjq_M";
+
+    // if (token == null) {
+    //   throw MissingTokenException();
+    // }
 
     try {
-      print("assessment v2.1.1");
-
       // Check if token is expired
-      if (JwtDecoder.isExpired(token)) {
-        throw InvalidSurveyTokenException();
-      }
+      // if (JwtDecoder.isExpired(token)) {
+      //   throw InvalidSurveyTokenException();
+      // }
 
-      final decodedToken = JwtDecoder.decode(token);
-      orgId = decodedToken['orgId'] as String?;
-      assessmentId = decodedToken['assessmentId'] as String?;
-      docId = decodedToken['docId'] as String?;
+      // final decodedToken = JwtDecoder.decode(token);
+      // orgId = decodedToken['orgId'] as String?;
+      // assessmentId = decodedToken['assessmentId'] as String?;
+      // docId = decodedToken['docId'] as String?;
 
-      // orgId = 'test';
-      // assessmentId = 'test';
-      // docId = 'test';
+      orgId = 'test';
+      assessmentId = 'test';
+      docId = 'test';
 
-      print('orgId: $orgId');
-      print('assessmentId: $assessmentId');
-      print('docId: $docId');
+      logger.info('Initializing with orgId: $orgId, assessmentId: $assessmentId, docId: $docId');
 
       if (orgId == null || orgId.isEmpty ||
           assessmentId == null || assessmentId.isEmpty ||
@@ -73,7 +67,7 @@ Future<void> main() async {
       }
 
       // Store the JWT token in AuthService for API requests after validation
-      AuthService.setJwtToken(token);
+      //AuthService.setJwtToken(token);
     } on FormatException {
       throw InvalidSurveyTokenException();
     } catch (e) {
@@ -92,6 +86,7 @@ Future<void> main() async {
           ),
         ),
         ChangeNotifierProvider(create: (context) => SurveyDataProvider(orgId: orgId, assessmentID: assessmentId, docId: docId)),
+        ChangeNotifierProvider(create: (context) => WelcomeScreenProvider()),
       ],
       child: MyApp(),
     ));

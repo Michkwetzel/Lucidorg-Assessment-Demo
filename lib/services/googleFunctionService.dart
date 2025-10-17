@@ -1,5 +1,4 @@
 import 'package:lucid_org/constants.dart';
-import 'package:lucid_org/exceptions.dart';
 import 'package:lucid_org/services/httpService.dart';
 import 'package:lucid_org/services/authService.dart';
 import 'package:logging/logging.dart';
