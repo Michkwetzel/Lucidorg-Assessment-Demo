@@ -1,16 +1,61 @@
-# front_survey_questions
+# LucidOrg Assessment Application
 
-A new Flutter project.
+Employee-facing assessment interface for organizational health surveys.
 
-## Getting Started
 
-This project is a starting point for a Flutter application.
+https://github.com/user-attachments/assets/f43170fe-ece1-4f4a-8dbd-9dca8b14612e
 
-A few resources to get you started if this is your first Flutter project:
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+## What It Does
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Users receive an email with a unique JWT-authenticated link to complete organizational health assessments. Results are submitted directly to the backend API—no direct database writes from the frontend.
+
+## Tech Stack
+
+- **Frontend**: Flutter/Dart
+- **Backend**: Google Cloud Functions (Python)
+- **Database**: Cloud Firestore
+- **Auth**: JWT token-based
+- **Deployment**: Firebase Hosting
+
+## How It Works
+
+1. User receives email with unique assessment link containing JWT token
+2. User completes assessment through guided interface
+3. Results submit to backend API via REST endpoints
+4. Backend validates JWT and processes data
+
+## Platform Integration
+
+This assessment frontend integrates with two admin platforms:
+
+| Platform | Purpose | Status |
+|----------|---------|--------|
+| **MVP Dashboard** | Original SaaS platform for distributing assessments and viewing results | Deprecated (Oct 2024 - Feb 2025) |
+| **Org Studio** | Rebuilt internal business tool | Active (July 2025+) |
+
+Both platforms use this same assessment frontend with different backend architectures.
+
+## Security Model
+
+- JWT tokens embedded in assessment URLs
+- Backend-only database writes
+- Token validation on all API requests
+- Locked-down Firestore with no direct frontend access
+
+## Key Features
+
+- Guided assessment flow with progress tracking
+- Responsive design (mobile + desktop)
+- Automatic retry logic for failed requests
+- Stateless architecture—all state managed via backend
+
+## Related Repositories
+
+- [MVP Dashboard Repository] - Original SaaS admin platform
+- [Org Studio Repository] - Current business logic platform
+- [Full Case Study](https://www.notion.so/LucidOrg-Assessment-Platform-From-Manual-to-Automated-SaaS-Deep-Dive-28db502d0e3a80aa9a12c88c7a4a274c?pvs=21) - Complete technical breakdown
+
+---
+
+**Built as Founding Engineer | Oct 2024 - Oct 2025**
