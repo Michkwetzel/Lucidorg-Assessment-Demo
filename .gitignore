@@ -47,3 +47,9 @@ app.*.map.json
 firebase.json 
 
 /lib/firebase_options.dart
+
+.firebase/
+.github/workflows/
+.vscode copy/
+.vscode/
+.firebaserc
