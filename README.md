@@ -39,7 +39,7 @@ Both platforms use this same assessment frontend with different backend architec
 - Automatic retry logic for failed requests
 
 ## 📚 Related Repositories
-- [MVP Dashboard Repository] - Original SaaS admin platform
+- [MVP Dashboard Repository](https://github.com/Michkwetzel/Lucidorg-Dashboard-Demo) - Original SaaS admin platform
 - [Org Studio Repository] - Current business logic platform
 - [Full Case Study](https://www.notion.so/LucidOrg-Assessment-Platform-From-Manual-to-Automated-SaaS-Deep-Dive-28db502d0e3a80aa9a12c88c7a4a274c?pvs=21) - Complete technical breakdown
 ---
