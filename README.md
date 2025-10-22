@@ -41,6 +41,6 @@ Both platforms use this same assessment frontend with different backend architec
 ## 📚 Related Repositories
 - [MVP Dashboard Repository](https://github.com/Michkwetzel/Lucidorg-Dashboard-Demo) - Original SaaS admin platform
 - [Org Studio Repository] - Current business logic platform
-- [Full Case Study](https://www.notion.so/LucidOrg-Assessment-Platform-From-Manual-to-Automated-SaaS-Deep-Dive-28db502d0e3a80aa9a12c88c7a4a274c?pvs=21) - Complete technical breakdown
+- [Full Case Study](https://www.notion.so/Case-Study-1-Assessment-Platform-MVP-294b502d0e3a809f8142e4b78171f6e7?source=copy_link) - Complete technical breakdown
 ---
 **Built as Founding Engineer | Oct 2024 - Oct 2025**
